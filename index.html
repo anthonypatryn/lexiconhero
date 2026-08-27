@@ -131,7 +131,7 @@
   .item-chip button:hover:not(:disabled){filter:brightness(1.25);}
   .item-chip button:disabled{opacity:0.4; cursor:not-allowed;}
 
-  /* --- Map view --- */
+  /* --- Map view (Spire-style branching graph) --- */
   .map-view{
     background:var(--ink-1);
     border:1px solid var(--ink-3);
@@ -139,60 +139,68 @@
     padding:20px;
     display:flex;
     flex-direction:column;
-    gap:6px;
+    gap:12px;
   }
   .map-view.hidden{display:none;}
-  .map-header{margin-bottom:8px;}
-  .map-header h2{font-family:var(--font-display); font-size:20px; margin:0 0 4px; letter-spacing:0.04em;}
-  .map-header p{margin:0; font-size:12.5px; color:var(--muted); line-height:1.5;}
-  .map-track{display:flex; flex-direction:column;}
-  .map-floor{display:flex; flex-direction:column; align-items:center; gap:8px;}
-  .map-floor-label{font-family:var(--font-mono); font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted);}
-  .map-floor[data-status="current"] .map-floor-label{color:var(--gold);}
-  .map-nodes{display:flex; gap:14px; justify-content:center; flex-wrap:wrap; width:100%;}
-  .map-connector{width:2px; height:22px; background:linear-gradient(var(--ink-3), var(--ink-3)); margin:2px 0;}
-  .map-connector[data-crossed="true"]{background:linear-gradient(var(--gold-dim), var(--gold-dim));}
+  .map-header{display:flex; align-items:baseline; justify-content:space-between; gap:10px; flex-wrap:wrap;}
+  .map-header h2{font-family:var(--font-display); font-size:20px; margin:0; letter-spacing:0.04em;}
+  .map-header .floor-badge{font-family:var(--font-mono); font-size:11px; color:var(--gold); letter-spacing:0.08em; text-transform:uppercase;}
+  .map-legend{margin:0; font-size:12px; color:var(--muted); line-height:1.5;}
 
-  .map-node{
-    position:relative;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    gap:5px;
-    width:118px;
-    padding:12px 10px 10px;
-    background:var(--ink-2);
+  .map-scroll{
+    max-height:62vh;
+    overflow:auto;
     border:1px solid var(--ink-3);
     border-radius:var(--radius-m);
-    font-family:var(--font-body);
-    color:var(--bone-dim);
+    background:
+      radial-gradient(ellipse 500px 260px at 50% 0%, rgba(227,165,61,0.05), transparent 70%),
+      var(--ink-0);
+  }
+  .map-canvas{position:relative;}
+  .map-edges{position:absolute; top:0; left:0; z-index:0; pointer-events:none;}
+  .map-node-wrap{position:absolute; z-index:1; display:flex; flex-direction:column; align-items:center;}
+
+  .map-dot{
+    width:40px; height:40px;
+    border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--ink-2);
+    border:2px solid var(--node-color, var(--ink-3));
+    color:var(--bone);
+    font-family:var(--font-mono);
+    font-weight:700;
+    font-size:14px;
     cursor:default;
-    text-align:center;
+    box-shadow:0 0 0 rgba(0,0,0,0);
   }
-  .map-node--boss{border-color:var(--tier-5); box-shadow:0 0 14px rgba(192,68,111,0.25);}
-  .map-node--shop{border-style:dashed;}
-  .map-node .node-gem{width:11px; height:11px; border-radius:2px; transform:rotate(45deg); background:var(--node-color, var(--tier-1)); box-shadow:0 0 8px var(--node-color, var(--tier-1));}
-  .map-node .node-gem.coin{border-radius:50%; transform:none; background:var(--shop); box-shadow:0 0 8px var(--shop);}
-  .map-node .node-len{font-family:var(--font-mono); font-size:15px; font-weight:700; color:var(--bone);}
-  .map-node .node-tier{font-size:10px; letter-spacing:0.08em; text-transform:uppercase; color:var(--node-color, var(--tier-1)); font-weight:700;}
-  .map-node .node-tier.shop{color:var(--shop);}
-  .map-node .node-spoils{font-family:var(--font-mono); font-size:10.5px; color:var(--muted);}
-  .map-node .node-badge{
-    position:absolute; top:-8px; right:-8px; width:22px; height:22px; border-radius:50%;
-    display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700;
-    border:1px solid var(--ink-1);
+  .map-dot.type-shop{color:var(--shop); border-style:dashed;}
+  .map-dot.type-rest{color:var(--tile-green);}
+  .map-dot.type-event{color:var(--tier-3);}
+  .map-dot.type-elite{box-shadow:0 0 10px var(--node-color, var(--tier-4));}
+  .map-dot.type-boss{width:48px; height:48px; font-size:11px; box-shadow:0 0 16px var(--tier-5); border-width:3px;}
+  .map-node-wrap[data-status="current"] .map-dot{cursor:pointer; border-color:var(--gold); box-shadow:0 0 12px rgba(227,165,61,0.55);}
+  .map-node-wrap[data-status="current"] .map-dot:hover{filter:brightness(1.2); transform:scale(1.08);}
+  .map-node-wrap[data-status="current"] .map-dot:focus-visible{outline:2px solid var(--gold); outline-offset:2px;}
+  .map-node-wrap[data-status="unreached"] .map-dot{opacity:0.55;}
+  .map-node-wrap[data-status="won"] .map-dot{opacity:0.8; background:var(--tile-green); border-color:var(--tile-green); color:#0d150f;}
+  .map-node-wrap[data-status="escaped"] .map-dot{opacity:0.75; background:var(--crimson-dim); border-color:var(--crimson-dim);}
+  .map-node-wrap[data-status="visited"] .map-dot{opacity:0.75; background:var(--shop); border-color:var(--shop); color:#241a05;}
+  .node-tip{
+    position:absolute; top:44px; left:50%; transform:translateX(-50%);
+    font-family:var(--font-mono); font-size:9px; color:var(--muted);
+    white-space:nowrap; pointer-events:none;
   }
-  .map-node[data-status="current"]{cursor:pointer; border-color:var(--gold); background:var(--ink-3); color:var(--bone);}
-  .map-node[data-status="current"]:hover{filter:brightness(1.12); transform:translateY(-1px);}
-  .map-node[data-status="current"]:focus-visible{outline:2px solid var(--gold); outline-offset:2px;}
-  .map-node[data-status="locked"]{opacity:0.38;}
-  .map-node[data-status="not-taken"]{opacity:0.32;}
-  .map-node[data-status="resolved-won"]{opacity:0.85; border-color:var(--tile-green);}
-  .map-node[data-status="resolved-won"] .node-badge{background:var(--tile-green); color:#0d150f;}
-  .map-node[data-status="resolved-escaped"]{opacity:0.7; border-color:var(--crimson-dim);}
-  .map-node[data-status="resolved-escaped"] .node-badge{background:var(--crimson-dim); color:var(--bone);}
-  .map-node[data-status="resolved-visited"]{opacity:0.7; border-color:var(--shop);}
-  .map-node[data-status="resolved-visited"] .node-badge{background:var(--shop); color:#241a05;}
+
+  .map-current-info{
+    display:flex; flex-direction:column; gap:8px;
+  }
+  .current-option{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    background:var(--ink-2); border:1px solid var(--ink-3); border-radius:var(--radius-s);
+    padding:9px 12px;
+    font-family:var(--font-mono); font-size:12px; color:var(--bone-dim);
+  }
+  .current-option strong{color:var(--bone);}
 
   /* --- Shop view --- */
   .shop-view{
@@ -357,7 +365,6 @@
   @media (max-width:420px){
     .tile{width:30px; height:30px; font-size:14px;}
     .enemy-stats-row{gap:12px;}
-    .map-node{width:100px; padding:10px 6px 8px;}
     .shop-offer{flex-direction:column; align-items:stretch; text-align:center;}
   }
 </style>
@@ -388,10 +395,16 @@
 
   <div class="map-view" id="map-view">
     <div class="map-header">
-      <h2>Choose your path</h2>
-      <p>Same length = same effort to kill (equal HP). Higher tier hits harder each round but pays more spoils. Shops (dashed) let you spend spoils instead of fighting.</p>
+      <h2>The Path</h2>
+      <span class="floor-badge" id="floor-badge">Floor 1 / 3</span>
     </div>
-    <div class="map-track" id="map-track"></div>
+    <p class="map-legend">Number = word length, ring color = tier, dashed = shop, green = rest, purple "?" = event, glowing = elite, large = boss. Scroll to see what's ahead.</p>
+    <div class="map-scroll" id="map-scroll">
+      <div class="map-canvas" id="map-canvas">
+        <svg class="map-edges" id="map-edges"></svg>
+      </div>
+    </div>
+    <div class="map-current-info" id="map-current-info"></div>
   </div>
 
   <div class="shop-view hidden" id="shop-view">
@@ -460,20 +473,21 @@
     5: { name: 'Arcane',   color: '#c0446f' }
   };
 
-  // Each floor is either a single fixed encounter (start / boss) or a
-  // branching choice of 2-3 encounters, generally matched on length
-  // (equal HP) but differing in obscurity tier (attack + spoils).
-  var FLOOR_DEFS = [
-    { fixed: [ { word: 'cat', tier: 1 } ] },
-    { choices: [ { word: 'fish', tier: 1 }, { word: 'glum', tier: 2 } ] },
-    { choices: [ { word: 'brisk', tier: 2 }, { word: 'glyph', tier: 3 }, { word: 'phlox', tier: 5 } ] },
-    { choices: [ { word: 'table', tier: 1 }, { word: 'epoxy', tier: 4 } ] },
-    { choices: [ { word: 'gambit', tier: 3 }, { word: 'quartz', tier: 4 } ] },
-    { choices: [ { word: 'gadget', tier: 1 }, { word: 'oxalis', tier: 5 } ] },
-    { choices: [ { word: 'phoenix', tier: 4 }, { word: 'zygotic', tier: 5 } ] },
-    { choices: [ { word: 'jackpot', tier: 1 }, { word: 'paradox', tier: 3 } ] },
-    { fixed: [ { word: 'quixotic', tier: 5, boss: true } ] }
-  ];
+  var SCRABBLE = {
+    a:1,e:1,i:1,o:1,u:1,l:1,n:1,s:1,t:1,r:1,
+    d:2,g:2,
+    b:3,c:3,m:3,p:3,
+    f:4,h:4,v:4,w:4,y:4,
+    k:5,
+    j:8,x:8,
+    q:10,z:10
+  };
+
+  // Per-length quintile cutoffs on avg-letter-Scrabble-value, precomputed
+  // offline from the ENABLE list. Used as an automatic, no-curation-needed
+  // stand-in for "obscurity tier" so procedurally chosen words still get a
+  // reasonable, evenly-spread tier assignment.
+  var TIER_CUTOFFS = {"3":[1.333,1.667,2.0,2.667],"4":[1.25,1.75,2.0,2.25],"5":[1.4,1.6,1.8,2.2],"6":[1.333,1.5,1.833,2.167],"7":[1.286,1.571,1.714,2.0],"8":[1.375,1.5,1.625,2.0]};
 
   var SHOP_CATALOG = [
     { kind: 'armor',  value: 3, cost: 4, name: 'Armor 3',            desc: 'Absorbs the next 3 damage before it breaks.' },
@@ -484,15 +498,25 @@
     { kind: 'orb',    value: 2, cost: 5, name: 'Orb of Knowledge 2', desc: 'Reveals 2 letters in the word — not their position. Fight only.' }
   ];
 
+  var EVENT_OUTCOMES = [
+    { text: 'A stray coin purse — found {n} spoils.', apply: function(s){ var n = 2 + Math.floor(Math.random()*3); s.spoils += n; return n; } },
+    { text: 'A hidden cache — found a Healing Potion 2.', apply: function(s){ s.inventory.push({ id: s.nextItemId++, kind:'potion', value:2 }); return null; } },
+    { text: 'A hidden cache — found an Orb of Knowledge 1.', apply: function(s){ s.inventory.push({ id: s.nextItemId++, kind:'orb', value:1 }); return null; } },
+    { text: 'A snapping trap — took 1 damage.', apply: function(s){ s.playerHP = Math.max(0, s.playerHP - 1); return null; } }
+  ];
+
+  var FLOOR_COUNT = 3;
+  var ROWS_PER_FLOOR = 15;   // normal branching rows; a boss row is appended after these
+  var TOTAL_COLUMNS = 7;
+  var BOSS_WORDS = ['gambit', 'phoenix', 'quixotic'];
+  var BOSS_LABELS = ['Mini-Boss', 'Mini-Boss', 'Final Boss'];
+
   var MAX_HEARTS = 6;
   var MAX_HP = MAX_HEARTS * 2;
   var MAX_GUESSES = 6;
-  var SHOP_FLOOR_COUNT = 2;
-  var SHOP_OFFER_COUNT = 3;
 
   var state = null;
   var fight = null;
-  var floors = null;          // this run's floor layout (fight/shop slots)
   var currentShopOpt = null;
   var currentOffers = null;
 
@@ -503,45 +527,164 @@
     }
     return arr;
   }
+  function randInt(min, max){ return min + Math.floor(Math.random() * (max - min + 1)); }
+  function pickRandom(arr){ return arr[randInt(0, arr.length - 1)]; }
 
-  function buildFloors(){
-    var built = FLOOR_DEFS.map(function(def, floorIndex){
-      var isFixed = !!def.fixed;
-      var raw = def.fixed || def.choices;
-      var options = raw.map(function(opt, choiceIndex){
-        var length = opt.word.length;
-        return {
-          type: 'fight',
-          word: opt.word,
-          length: length,
-          tier: opt.tier,
-          boss: !!opt.boss,
-          hp: length * 2,
-          atk: opt.tier,
-          spoils: length + opt.tier,
-          floorIndex: floorIndex,
-          choiceIndex: choiceIndex
-        };
-      });
-      return { isFixed: isFixed, boss: options[0].boss, options: options };
-    });
-
-    var eligible = [];
-    built.forEach(function(f, i){ if (!f.isFixed) eligible.push(i); });
-    shuffle(eligible);
-    var shopCount = Math.min(SHOP_FLOOR_COUNT, eligible.length);
-    for (var s = 0; s < shopCount; s++){
-      var fi = eligible[s];
-      var opts = built[fi].options;
-      var slot = Math.floor(Math.random() * opts.length);
-      opts[slot] = { type: 'shop', floorIndex: fi, choiceIndex: slot };
-    }
-    return built;
+  function pickDistinctColumns(count, totalCols){
+    var cols = [];
+    for (var i = 0; i < totalCols; i++) cols.push(i);
+    shuffle(cols);
+    return cols.slice(0, Math.min(count, totalCols)).sort(function(a,b){ return a-b; });
   }
+
+  function tierForWord(word){
+    var L = word.length;
+    var cutoffs = TIER_CUTOFFS[String(L)] || [1.4, 1.7, 2.0, 2.4];
+    var score = 0;
+    for (var i = 0; i < word.length; i++) score += (SCRABBLE[word[i]] || 2);
+    var avg = score / word.length;
+    if (avg <= cutoffs[0]) return 1;
+    if (avg <= cutoffs[1]) return 2;
+    if (avg <= cutoffs[2]) return 3;
+    if (avg <= cutoffs[3]) return 4;
+    return 5;
+  }
+
+  function lengthForRow(rowIndex, totalRows){
+    var progress = rowIndex / totalRows;
+    if (progress < 0.35) return pickRandom([3, 4, 4, 5]);
+    if (progress < 0.7) return pickRandom([5, 5, 6, 6]);
+    return pickRandom([6, 7, 7, 8]);
+  }
+
+  function pickWordAndTier(length, forceMinTier){
+    var pool = DICT_RAW[String(length)];
+    var word;
+    var tries = 0;
+    do { word = pickRandom(pool); tries++; } while (state.usedWords.has(word) && tries < 12);
+    state.usedWords.add(word);
+    var tier = tierForWord(word);
+    if (forceMinTier) tier = Math.max(tier, forceMinTier);
+    return { word: word, length: length, tier: tier };
+  }
+
+  function makeFightNode(row, col, floorIndex, rowIndex, opts){
+    opts = opts || {};
+    var length = opts.length || lengthForRow(rowIndex, ROWS_PER_FLOOR);
+    var picked = pickWordAndTier(length, opts.forceMinTier);
+    var bonus = opts.bonusSpoils || 0;
+    return {
+      id: floorIndex + '-' + row + '-' + col,
+      row: row, col: col,
+      type: opts.elite ? 'elite' : (opts.boss ? 'boss' : 'fight'),
+      word: picked.word, length: picked.length, tier: picked.tier,
+      hp: picked.length * 2, atk: picked.tier,
+      spoils: picked.length + picked.tier + bonus,
+      bossLabel: opts.bossLabel || null,
+      edgesOut: []
+    };
+  }
+
+  // ---------- floor graph generation ----------
+
+  function buildFloorGraph(floorIndex){
+    var rows = [];
+
+    for (var r = 0; r < ROWS_PER_FLOOR; r++){
+      var count = randInt(3, 4);
+      var cols = pickDistinctColumns(count, TOTAL_COLUMNS);
+      var restForced = (r === ROWS_PER_FLOOR - 1) ? pickRandom(cols) : null;
+      var nodes = cols.map(function(c){
+        var type = pickTypeForRow(r, c, restForced);
+        if (type === 'shop') return { id: floorIndex+'-'+r+'-'+c, row:r, col:c, type:'shop', edgesOut:[] };
+        if (type === 'rest') return { id: floorIndex+'-'+r+'-'+c, row:r, col:c, type:'rest', edgesOut:[] };
+        if (type === 'event') return { id: floorIndex+'-'+r+'-'+c, row:r, col:c, type:'event', edgesOut:[] };
+        if (type === 'elite') return makeFightNode(r, c, floorIndex, r, { elite:true, forceMinTier:4, bonusSpoils:3 });
+        return makeFightNode(r, c, floorIndex, r, {});
+      });
+      rows.push(nodes);
+    }
+
+    // boss row: single guaranteed convergence node
+    var isFinal = floorIndex >= FLOOR_COUNT - 1;
+    var bossRow = ROWS_PER_FLOOR;
+    var bossCol = Math.floor(TOTAL_COLUMNS / 2);
+    var bossNode = makeFightNode(bossRow, bossCol, floorIndex, ROWS_PER_FLOOR, {
+      boss: true,
+      length: BOSS_WORDS[floorIndex].length,
+      forceMinTier: 5,
+      bonusSpoils: isFinal ? 8 : 5,
+      bossLabel: BOSS_LABELS[floorIndex]
+    });
+    // force the curated boss word directly rather than a random pick of that length
+    bossNode.word = BOSS_WORDS[floorIndex];
+    bossNode.tier = 5;
+    bossNode.hp = bossNode.length * 2;
+    bossNode.atk = 5;
+    bossNode.spoils = bossNode.length + 5 + (isFinal ? 8 : 5);
+    rows.push([bossNode]);
+
+    // edges: connect each row to the next, favoring nearby columns, then
+    // guarantee no orphaned node (every non-start node has >=1 incoming edge)
+    for (var ri = 0; ri < rows.length - 1; ri++){
+      rows[ri].forEach(function(node){
+        var nextRow = rows[ri + 1];
+        var near = nextRow.filter(function(n){ return Math.abs(n.col - node.col) <= 1; });
+        if (!near.length){
+          near = [nextRow.slice().sort(function(a,b){
+            return Math.abs(a.col - node.col) - Math.abs(b.col - node.col);
+          })[0]];
+        }
+        var edgeCount = (Math.random() < 0.3 && near.length > 1) ? 2 : 1;
+        var chosen = shuffle(near.slice()).slice(0, edgeCount);
+        node.edgesOut = chosen.map(function(n){ return n.id; });
+      });
+      var thisRow = rows[ri];
+      rows[ri + 1].forEach(function(target){
+        var hasIncoming = thisRow.some(function(n){ return n.edgesOut.indexOf(target.id) !== -1; });
+        if (!hasIncoming){
+          var nearest = thisRow.slice().sort(function(a,b){
+            return Math.abs(a.col - target.col) - Math.abs(b.col - target.col);
+          })[0];
+          nearest.edgesOut.push(target.id);
+        }
+      });
+    }
+
+    var nodesById = {};
+    rows.forEach(function(row){ row.forEach(function(n){ nodesById[n.id] = n; }); });
+
+    return { rows: rows, nodesById: nodesById, floorIndex: floorIndex };
+  }
+
+  function pickTypeForRow(r, c, restForcedCol){
+    if (r === 0) return 'fight';
+    if (r === ROWS_PER_FLOOR - 1 && c === restForcedCol) return 'rest';
+    if (r === 1) return Math.random() < 0.75 ? 'fight' : 'event';
+    var roll = Math.random();
+    if (r === ROWS_PER_FLOOR - 1){
+      // no elites right before the boss
+      if (roll < 0.55) return 'fight';
+      if (roll < 0.78) return 'event';
+      return 'shop';
+    }
+    if (roll < 0.45) return 'fight';
+    if (roll < 0.65) return 'event';
+    if (roll < 0.77) return 'shop';
+    if (roll < 0.90) return 'elite';
+    return 'rest';
+  }
+
+  // ---------- run / floor lifecycle ----------
 
   function freshRunState(){
     return {
-      mapIndex: 0,
+      floorIndex: 0,
+      graph: null,
+      currentNodeId: null,
+      path: [],
+      visited: {},
+      usedWords: new Set(),
       playerHP: MAX_HP,
       shield: 0,
       spoils: 0,
@@ -550,17 +693,47 @@
       totalDealt: 0,
       totalTaken: 0,
       fightsCleared: 0,
-      resolutions: new Array(FLOOR_DEFS.length).fill(null),
       ended: false
     };
+  }
+
+  function startRun(){
+    state = freshRunState();
+    state.graph = buildFloorGraph(0);
+    document.getElementById('end-banner').classList.add('hidden');
+    document.getElementById('log').innerHTML = '';
+    showMap();
+  }
+
+  function startFloor(){
+    state.graph = buildFloorGraph(state.floorIndex);
+    state.currentNodeId = null;
+    state.path = [];
+    state.visited = {};
+    showMap();
+  }
+
+  // Moves the player's cursor onto `node` and records it in the ordered
+  // path so the map can tell exactly which edges were actually walked.
+  function advanceCursor(node){
+    state.currentNodeId = node.id;
+    state.path.push(node.id);
+  }
+
+  function wasEdgeTraveled(fromId, toId){
+    for (var i = 0; i < state.path.length - 1; i++){
+      if (state.path[i] === fromId && state.path[i + 1] === toId) return true;
+    }
+    return false;
   }
 
   // ---------- shared chrome ----------
 
   function renderTopbar(){
-    document.getElementById('progress-value').textContent = (state.mapIndex + 1) + ' / ' + floors.length;
+    document.getElementById('floor-badge').textContent = 'Floor ' + (state.floorIndex + 1) + ' / ' + FLOOR_COUNT;
     document.getElementById('spoils-value').textContent = state.spoils;
     document.getElementById('shield-value').textContent = state.shield;
+    document.getElementById('progress-value').textContent = 'Floor ' + (state.floorIndex + 1) + ' / ' + FLOOR_COUNT;
     renderHearts();
     renderInventory();
   }
@@ -620,7 +793,7 @@
       renderTopbar();
     } else if (item.kind === 'orb'){
       if (!fight) return;
-      var secretLetters = Array.from(new Set(fight.enc.word.split('')));
+      var secretLetters = Array.from(new Set(fight.node.word.split('')));
       var unknown = secretLetters.filter(function(l){ return !fight.knownLetters.has(l); });
       shuffle(unknown);
       var reveal = unknown.slice(0, item.value);
@@ -632,7 +805,18 @@
     }
   }
 
-  // ---------- map view ----------
+  // ---------- map rendering ----------
+
+  var NODE_SIZE = 40;
+  var ROW_HEIGHT = 64;
+  var COL_WIDTH = 62;
+  var CANVAS_PAD = 30;
+
+  function availableNodeIds(){
+    if (state.currentNodeId === null) return state.graph.rows[0].map(function(n){ return n.id; });
+    var cur = state.graph.nodesById[state.currentNodeId];
+    return cur ? cur.edgesOut.slice() : [];
+  }
 
   function showMap(){
     fight = null;
@@ -644,107 +828,147 @@
     renderMap();
   }
 
+  function nodeLabel(node){
+    if (node.type === 'shop') return 'Shop — spend spoils';
+    if (node.type === 'rest') return 'Rest — heal to full';
+    if (node.type === 'event') return 'Unknown event';
+    var kind = node.type === 'boss' ? (node.bossLabel || 'Boss') : (node.type === 'elite' ? 'Elite' : 'Fight');
+    return kind + ': L' + node.length + ' · ' + TIERS[node.tier].name + ' · ' + node.hp + ' HP · atk ' + node.atk + '/rd · +' + node.spoils + ' spoils';
+  }
+
   function renderMap(){
-    var track = document.getElementById('map-track');
-    track.innerHTML = '';
+    var graph = state.graph;
+    var totalRows = ROWS_PER_FLOOR + 1;
+    var canvas = document.getElementById('map-canvas');
+    var svg = document.getElementById('map-edges');
+    canvas.querySelectorAll('.map-node-wrap').forEach(function(el){ el.remove(); });
 
-    floors.forEach(function(floor, floorIndex){
-      if (floorIndex > 0){
-        var connector = document.createElement('div');
-        connector.className = 'map-connector';
-        if (floorIndex - 1 < state.mapIndex) connector.setAttribute('data-crossed', 'true');
-        track.appendChild(connector);
-      }
+    var width = CANVAS_PAD * 2 + (TOTAL_COLUMNS - 1) * COL_WIDTH + NODE_SIZE;
+    var height = CANVAS_PAD * 2 + (totalRows - 1) * ROW_HEIGHT + NODE_SIZE;
+    canvas.style.width = width + 'px';
+    canvas.style.height = height + 'px';
+    svg.setAttribute('width', width);
+    svg.setAttribute('height', height);
+    svg.innerHTML = '';
 
-      var row = document.createElement('div');
-      row.className = 'map-floor';
-      row.setAttribute('data-status', floorIndex === state.mapIndex ? 'current' : (floorIndex < state.mapIndex ? 'resolved' : 'locked'));
+    function xFor(col){ return CANVAS_PAD + col * COL_WIDTH; }
+    function yFor(row){ return CANVAS_PAD + (totalRows - 1 - row) * ROW_HEIGHT; }
 
-      var label = document.createElement('div');
-      label.className = 'map-floor-label';
-      label.textContent = floor.boss ? 'Boss' : ('Floor ' + (floorIndex + 1));
-      row.appendChild(label);
+    var available = availableNodeIds();
+    var currentInfoWrap = document.getElementById('map-current-info');
+    currentInfoWrap.innerHTML = '';
 
-      var nodes = document.createElement('div');
-      nodes.className = 'map-nodes';
-
-      var resolution = state.resolutions[floorIndex];
-
-      floor.options.forEach(function(opt){
-        var btn = document.createElement('button');
-        btn.type = 'button';
-        var isShop = opt.type === 'shop';
-        btn.className = 'map-node' + (opt.boss ? ' map-node--boss' : '') + (isShop ? ' map-node--shop' : '');
-        if (!isShop) btn.style.setProperty('--node-color', TIERS[opt.tier].color);
-
-        var status;
-        if (floorIndex < state.mapIndex){
-          if (resolution && resolution.choiceIndex === opt.choiceIndex){
-            status = resolution.result === 'won' ? 'resolved-won' : (resolution.result === 'visited' ? 'resolved-visited' : 'resolved-escaped');
-          } else {
-            status = 'not-taken';
-          }
-        } else if (floorIndex === state.mapIndex){
-          status = 'current';
-        } else {
-          status = 'locked';
-        }
-        btn.setAttribute('data-status', status);
-
-        var badgeHtml = '';
-        if (status === 'resolved-won') badgeHtml = '<span class="node-badge">✓</span>';
-        if (status === 'resolved-escaped') badgeHtml = '<span class="node-badge">↯</span>';
-        if (status === 'resolved-visited') badgeHtml = '<span class="node-badge">$</span>';
-
-        if (isShop){
-          btn.innerHTML =
-            '<span class="node-gem coin"></span>' +
-            '<span class="node-len">Shop</span>' +
-            '<span class="node-tier shop">Peddler</span>' +
-            '<span class="node-spoils">spend spoils</span>' +
-            badgeHtml;
-        } else {
-          btn.innerHTML =
-            '<span class="node-gem"></span>' +
-            '<span class="node-len">L' + opt.length + '</span>' +
-            '<span class="node-tier">' + TIERS[opt.tier].name + '</span>' +
-            '<span class="node-spoils">' + opt.hp + ' HP · +' + opt.spoils + ' spoils</span>' +
-            badgeHtml;
-        }
-
-        if (status === 'current'){
-          btn.addEventListener('click', function(){ selectNode(opt); });
-        } else {
-          btn.disabled = true;
-        }
-
-        nodes.appendChild(btn);
+    // edges first (so nodes draw on top)
+    graph.rows.forEach(function(rowNodes){
+      rowNodes.forEach(function(node){
+        node.edgesOut.forEach(function(targetId){
+          var target = graph.nodesById[targetId];
+          var traveled = wasEdgeTraveled(node.id, targetId);
+          var line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+          line.setAttribute('x1', xFor(node.col) + NODE_SIZE/2);
+          line.setAttribute('y1', yFor(node.row) + NODE_SIZE/2);
+          line.setAttribute('x2', xFor(target.col) + NODE_SIZE/2);
+          line.setAttribute('y2', yFor(target.row) + NODE_SIZE/2);
+          line.setAttribute('stroke', traveled ? '#8a6a30' : '#332e40');
+          line.setAttribute('stroke-width', traveled ? '2.5' : '1.5');
+          svg.appendChild(line);
+        });
       });
+    });
 
-      row.appendChild(nodes);
-      track.appendChild(row);
+    graph.rows.forEach(function(rowNodes){
+      rowNodes.forEach(function(node){
+        var wrap = document.createElement('div');
+        wrap.className = 'map-node-wrap';
+        wrap.style.left = xFor(node.col) + 'px';
+        wrap.style.top = yFor(node.row) + 'px';
+
+        var visitedResult = state.visited[node.id];
+        var status = visitedResult ? visitedResult : (available.indexOf(node.id) !== -1 ? 'current' : 'unreached');
+        wrap.setAttribute('data-status', status);
+
+        var dot = document.createElement('button');
+        dot.type = 'button';
+        dot.className = 'map-dot type-' + node.type;
+        if (node.type === 'fight' || node.type === 'elite' || node.type === 'boss'){
+          dot.style.setProperty('--node-color', TIERS[node.tier].color);
+          dot.textContent = node.type === 'boss' ? 'BOSS' : node.length;
+        } else if (node.type === 'shop'){
+          dot.textContent = '$';
+        } else if (node.type === 'rest'){
+          dot.textContent = '+';
+        } else if (node.type === 'event'){
+          dot.textContent = '?';
+        }
+        dot.title = nodeLabel(node);
+        if (status === 'current'){
+          dot.addEventListener('click', function(){ selectNode(node); });
+        } else {
+          dot.disabled = true;
+        }
+        wrap.appendChild(dot);
+        canvas.appendChild(wrap);
+      });
+    });
+
+    available.forEach(function(id){
+      var node = graph.nodesById[id];
+      var row = document.createElement('div');
+      row.className = 'current-option';
+      row.innerHTML = '<span>' + nodeLabel(node) + '</span><strong>Pick ↑</strong>';
+      currentInfoWrap.appendChild(row);
+    });
+
+    var scroller = document.getElementById('map-scroll');
+    var targetRow = state.currentNodeId === null ? 0 : graph.nodesById[state.currentNodeId].row;
+    var targetY = yFor(targetRow);
+    requestAnimationFrame(function(){
+      scroller.scrollTop = Math.max(0, targetY - scroller.clientHeight * 0.65);
     });
   }
 
-  function selectNode(opt){
-    if (opt.type === 'shop'){
-      openShop(opt);
-      return;
-    }
+  function selectNode(node){
+    if (node.type === 'shop'){ openShop(node); return; }
+    if (node.type === 'rest'){ resolveRest(node); return; }
+    if (node.type === 'event'){ resolveEvent(node); return; }
     document.getElementById('map-view').classList.add('hidden');
     document.getElementById('arena').classList.remove('hidden');
-    startFight(opt);
+    startFight(node);
+  }
+
+  function resolveRest(node){
+    var before = state.playerHP;
+    state.playerHP = MAX_HP;
+    state.visited[node.id] = 'visited';
+    log('Rested — healed ' + (state.playerHP - before) + ' HP to full.', 'event-shop');
+    advanceCursor(node);
+    renderTopbar();
+    showMap();
+  }
+
+  function resolveEvent(node){
+    var outcome = pickRandom(EVENT_OUTCOMES);
+    var n = outcome.apply(state);
+    state.visited[node.id] = 'visited';
+    log(outcome.text.replace('{n}', n), 'event-shop');
+    advanceCursor(node);
+    if (state.playerHP <= 0){
+      endRun(false, 'An unlucky event finished the run.');
+      return;
+    }
+    renderTopbar();
+    showMap();
   }
 
   // ---------- shop ----------
 
-  function openShop(opt){
-    currentShopOpt = opt;
+  function openShop(node){
+    currentShopOpt = node;
     document.getElementById('map-view').classList.add('hidden');
     document.getElementById('shop-view').classList.remove('hidden');
     var pool = SHOP_CATALOG.slice();
     shuffle(pool);
-    currentOffers = pool.slice(0, SHOP_OFFER_COUNT).map(function(tpl, i){
+    currentOffers = pool.slice(0, 3).map(function(tpl, i){
       return Object.assign({ offerId: i, purchased: false }, tpl);
     });
     renderShop();
@@ -787,22 +1011,22 @@
   }
 
   function leaveShop(){
-    var opt = currentShopOpt;
-    state.resolutions[opt.floorIndex] = { choiceIndex: opt.choiceIndex, result: 'visited' };
+    var node = currentShopOpt;
+    state.visited[node.id] = 'visited';
+    advanceCursor(node);
     currentShopOpt = null;
     currentOffers = null;
-    state.mapIndex++;
     document.getElementById('shop-view').classList.add('hidden');
     showMap();
   }
 
   // ---------- fight ----------
 
-  function startFight(enc){
+  function startFight(node){
     fight = {
-      enc: enc,
-      enemyHP: enc.hp,
-      bestState: new Array(enc.length).fill('unknown'),
+      node: node,
+      enemyHP: node.hp,
+      bestState: new Array(node.length).fill('unknown'),
       knownLetters: new Set(),
       guessesUsed: 0
     };
@@ -811,25 +1035,26 @@
     renderKnownLetters();
     renderGuessMeta();
     renderInventory();
-    log((enc.boss ? 'The boss appears: ' : 'A challenger appears: ') + 'a ' + enc.length + '-letter ' + TIERS[enc.tier].name.toLowerCase() + ' word.', 'event-kill');
-    document.getElementById('guess-input').setAttribute('maxlength', enc.length);
+    var intro = node.type === 'boss' ? ('The ' + (node.bossLabel || 'boss') + ' appears: ') : (node.type === 'elite' ? 'An elite blocks the way: ' : 'A challenger appears: ');
+    log(intro + 'a ' + node.length + '-letter ' + TIERS[node.tier].name.toLowerCase() + ' word.', 'event-kill');
+    document.getElementById('guess-input').setAttribute('maxlength', node.length);
     document.getElementById('guess-input').value = '';
     document.getElementById('guess-input').focus();
   }
 
   function renderEnemyPlaque(){
-    var enc = fight.enc;
-    var tier = TIERS[enc.tier];
+    var node = fight.node;
+    var tier = TIERS[node.tier];
     var plaque = document.getElementById('enemy-plaque');
     plaque.style.setProperty('--tier-color', tier.color);
     document.getElementById('tier-gem').style.background = tier.color;
     document.getElementById('tier-gem').style.boxShadow = '0 0 10px ' + tier.color;
-    document.getElementById('tier-label').textContent = tier.name + (enc.boss ? ' — Boss' : '');
+    document.getElementById('tier-label').textContent = tier.name + (node.type === 'boss' ? (' — ' + (node.bossLabel || 'Boss')) : (node.type === 'elite' ? ' — Elite' : ''));
     document.getElementById('tier-label').style.color = tier.color;
-    document.getElementById('enemy-name').textContent = enc.length + '-Letter Word';
-    document.getElementById('stat-length').textContent = enc.length;
-    document.getElementById('stat-attack').textContent = enc.atk;
-    document.getElementById('stat-spoils').textContent = enc.spoils;
+    document.getElementById('enemy-name').textContent = node.length + '-Letter Word';
+    document.getElementById('stat-length').textContent = node.length;
+    document.getElementById('stat-attack').textContent = node.atk;
+    document.getElementById('stat-spoils').textContent = node.spoils;
     updateHPBar();
   }
 
@@ -845,9 +1070,9 @@
   }
 
   function updateHPBar(){
-    var pct = Math.max(0, fight.enemyHP / fight.enc.hp * 100);
+    var pct = Math.max(0, fight.enemyHP / fight.node.hp * 100);
     document.getElementById('hp-fill').style.width = pct + '%';
-    document.getElementById('hp-numbers').textContent = Math.max(0, fight.enemyHP) + ' / ' + fight.enc.hp + ' HP';
+    document.getElementById('hp-numbers').textContent = Math.max(0, fight.enemyHP) + ' / ' + fight.node.hp + ' HP';
   }
 
   function renderGuessMeta(){
@@ -897,12 +1122,12 @@
   }
 
   function handleGuess(raw){
-    var enc = fight.enc;
+    var node = fight.node;
     var guess = raw.trim().toLowerCase();
 
-    if (guess.length !== enc.length){
+    if (guess.length !== node.length){
       shakeInput();
-      log('"' + raw.toUpperCase() + '" is not ' + enc.length + ' letters — no round consumed.', 'event-danger');
+      log('"' + raw.toUpperCase() + '" is not ' + node.length + ' letters — no round consumed.', 'event-danger');
       return;
     }
     if (!/^[a-z]+$/.test(guess)){
@@ -910,7 +1135,7 @@
       log('Guesses must be letters only — no round consumed.', 'event-danger');
       return;
     }
-    var dictSet = DICT[String(enc.length)];
+    var dictSet = DICT[String(node.length)];
     if (!dictSet || !dictSet.has(guess)){
       shakeInput();
       log('"' + raw.toUpperCase() + '" is not in the dictionary — no round consumed.', 'event-danger');
@@ -918,9 +1143,9 @@
     }
 
     fight.guessesUsed++;
-    var colors = scoreGuess(guess, enc.word);
+    var colors = scoreGuess(guess, node.word);
     var dmg = 0;
-    for (var i = 0; i < enc.length; i++){
+    for (var i = 0; i < node.length; i++){
       var c = colors[i];
       if (c === 'green'){
         if (fight.bestState[i] !== 'green'){ dmg += 2; fight.bestState[i] = 'green'; }
@@ -928,7 +1153,7 @@
         if (fight.bestState[i] === 'unknown'){ dmg += 1; fight.bestState[i] = 'yellow'; }
       }
     }
-    var isSolve = (guess === enc.word);
+    var isSolve = (guess === node.word);
     if (isSolve) dmg = fight.enemyHP;
 
     fight.enemyHP -= dmg;
@@ -941,7 +1166,7 @@
     var retaliation = 0;
     var absorbed = 0;
     if (!enemyDefeated && fight.guessesUsed > 1){
-      retaliation = enc.atk;
+      retaliation = node.atk;
       absorbed = Math.min(state.shield, retaliation);
       state.shield -= absorbed;
       var through = retaliation - absorbed;
@@ -966,47 +1191,57 @@
     document.getElementById('guess-input').value = '';
 
     if (state.playerHP <= 0){
-      state.resolutions[enc.floorIndex] = { choiceIndex: enc.choiceIndex, result: 'escaped' };
-      endRun(false, 'Fell at floor ' + (state.mapIndex + 1) + ' of ' + floors.length + '.');
+      state.visited[node.id] = 'escaped';
+      endRun(false, 'Fell to a ' + node.length + '-letter ' + TIERS[node.tier].name.toLowerCase() + ' word on Floor ' + (state.floorIndex + 1) + '.');
       return;
     }
 
     if (enemyDefeated){
       log(isSolve ? 'Solved outright — instant kill!' : 'Worn down to 0 HP — defeated!', 'event-kill');
-      recordResolution('won', true);
+      advanceFromNode(node, 'won');
       return;
     }
 
     if (fight.guessesUsed >= MAX_GUESSES){
       log('Out of guesses — the word slips away unsolved. No reward this fight.', 'event-danger');
-      recordResolution('escaped', true);
+      advanceFromNode(node, 'escaped');
       return;
     }
 
     renderGuessMeta();
   }
 
-  function recordResolution(result, mayAdvance){
-    var enc = fight.enc;
-    var earned = result === 'won' ? enc.spoils : 0;
-    if (earned) state.spoils += earned;
-    if (result === 'won') state.fightsCleared++;
-    state.resolutions[enc.floorIndex] = { choiceIndex: enc.choiceIndex, result: result };
+  function advanceFromNode(node, result){
+    if (result === 'won'){
+      state.spoils += node.spoils;
+      state.fightsCleared++;
+    }
+    state.visited[node.id] = result;
+    advanceCursor(node);
 
-    var wasBoss = enc.boss;
-    if (!mayAdvance) return;
-
-    if (wasBoss){
+    if (node.type === 'boss'){
+      var isFinal = state.floorIndex >= FLOOR_COUNT - 1;
       if (result === 'won'){
-        endRun(true, 'Cleared all ' + floors.length + ' floors — the boss falls.');
+        if (isFinal){
+          endRun(true, 'Cleared all ' + FLOOR_COUNT + ' floors — the final boss falls.');
+          return;
+        }
+        state.floorIndex++;
+        setTimeout(startFloor, 250);
+        return;
       } else {
-        endRun(false, 'Reached the boss and survived, but it slipped away unsolved.', 'Boss Escaped');
+        if (isFinal){
+          endRun(false, 'Reached the final boss and survived, but it slipped away unsolved.', 'Boss Escaped');
+          return;
+        }
+        // survived a mini-boss escape: still move on to the next floor
+        state.floorIndex++;
+        setTimeout(startFloor, 250);
+        return;
       }
-      return;
     }
 
-    state.mapIndex++;
-    setTimeout(showMap, 250);
+    setTimeout(showMap, 200);
   }
 
   function renderBoardRow(colors, guess, dmg, isSolve){
@@ -1049,10 +1284,9 @@
     document.getElementById('end-subtitle').textContent = subtitle;
     var stats = document.getElementById('end-stats');
     stats.innerHTML = '';
-    var resolvedCount = state.resolutions.filter(function(r){ return r !== null; }).length;
     var entries = [
       ['Fights won', state.fightsCleared],
-      ['Floors cleared', resolvedCount + ' / ' + floors.length],
+      ['Floor reached', (state.floorIndex + 1) + ' / ' + FLOOR_COUNT],
       ['Spoils earned', state.spoils],
       ['Shield remaining', state.shield],
       ['Damage dealt', state.totalDealt],
@@ -1065,16 +1299,6 @@
       d.innerHTML = '<span class="label">' + pair[0] + '</span><span class="value">' + pair[1] + '</span>';
       stats.appendChild(d);
     });
-  }
-
-  // ---------- run lifecycle ----------
-
-  function startRun(){
-    state = freshRunState();
-    floors = buildFloors();
-    document.getElementById('end-banner').classList.add('hidden');
-    document.getElementById('log').innerHTML = '';
-    showMap();
   }
 
   document.getElementById('guess-form').addEventListener('submit', function(ev){
