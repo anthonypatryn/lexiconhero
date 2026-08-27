@@ -1,4 +1,4 @@
-<title>Lexicon Arena</title>
+<title>Lexicon Hero</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Manrope:wght@400;500;600;700;800&family=Martian+Mono:wght@400;500;600;700&display=swap">
 <style>
   :root{
@@ -13,6 +13,8 @@
     --gold-dim:#8a6a30;
     --crimson:#d1495b;
     --crimson-dim:#7a2f38;
+    --steel:#6f9bb5;
+    --steel-dim:#3f5a68;
     --tile-green:#4f7a5b;
     --tile-gold:#c99a3e;
     --tile-gray:#3a3542;
@@ -21,6 +23,7 @@
     --tier-3:#8b6fc9;
     --tier-4:#d1813f;
     --tier-5:#c0446f;
+    --shop:#d9c25a;
     --radius-s:4px;
     --radius-m:8px;
     --font-display:'Cinzel', Georgia, 'Times New Roman', serif;
@@ -47,10 +50,7 @@
     *{animation-duration:0.01ms !important; transition-duration:0.01ms !important;}
   }
 
-  .masthead{
-    text-align:center;
-    margin-bottom:24px;
-  }
+  .masthead{text-align:center; margin-bottom:24px;}
   .masthead h1{
     font-family:var(--font-display);
     font-weight:900;
@@ -60,59 +60,76 @@
     color:var(--bone);
     text-wrap:balance;
   }
-  .masthead p{
-    margin:0;
-    color:var(--muted);
-    font-size:13px;
-    letter-spacing:0.03em;
-  }
+  .masthead p{margin:0; color:var(--muted); font-size:13px; letter-spacing:0.03em;}
 
-  .shell{
-    width:100%;
-    max-width:640px;
-    display:flex;
-    flex-direction:column;
-    gap:18px;
-  }
+  .shell{width:100%; max-width:640px; display:flex; flex-direction:column; gap:18px;}
 
   .topbar{
     display:flex;
     align-items:center;
     justify-content:space-between;
-    gap:16px;
+    gap:14px;
     background:var(--ink-1);
     border:1px solid var(--ink-3);
     border-radius:var(--radius-m);
     padding:14px 18px;
     flex-wrap:wrap;
   }
-  .run-progress{display:flex; flex-direction:column; gap:2px;}
-  .eyebrow{
-    font-size:10px;
-    letter-spacing:0.14em;
-    text-transform:uppercase;
-    color:var(--muted);
-  }
-  .progress-value{
+  .stat-block{display:flex; flex-direction:column; gap:2px;}
+  .stat-block.align-end{align-items:flex-end;}
+  .eyebrow{font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted);}
+  .stat-value{
     font-family:var(--font-mono);
     font-variant-numeric:tabular-nums;
     font-size:15px;
     font-weight:600;
     color:var(--bone);
   }
-  .spoils-stat{display:flex; flex-direction:column; gap:2px; align-items:flex-end;}
-  .spoils-value{
-    font-family:var(--font-mono);
-    font-variant-numeric:tabular-nums;
-    font-size:15px;
-    font-weight:600;
-    color:var(--gold);
-  }
+  .stat-value.gold{color:var(--gold);}
+  .stat-value.steel{color:var(--steel);}
   .hearts{display:flex; gap:4px;}
   .heart{width:22px; height:22px;}
   .heart-outline{fill:var(--ink-3); stroke:var(--muted); stroke-width:1;}
   .heart-fill{fill:var(--gold);}
   .heart.danger .heart-fill{fill:var(--crimson);}
+
+  /* --- Inventory --- */
+  .inventory-bar{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+  }
+  .inventory-bar.hidden{display:none;}
+  .item-chip{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    background:var(--ink-1);
+    border:1px solid var(--ink-3);
+    border-radius:var(--radius-m);
+    padding:8px 10px 8px 12px;
+    font-family:var(--font-mono);
+    font-size:12px;
+    color:var(--bone-dim);
+  }
+  .item-chip .item-dot{width:8px; height:8px; border-radius:50%; flex:none;}
+  .item-chip[data-kind="potion"] .item-dot{background:var(--tile-green);}
+  .item-chip[data-kind="orb"] .item-dot{background:var(--tier-3);}
+  .item-chip button{
+    font-family:var(--font-body);
+    font-weight:700;
+    font-size:10.5px;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    background:var(--ink-3);
+    color:var(--bone);
+    border:none;
+    border-radius:3px;
+    padding:5px 9px;
+    cursor:pointer;
+  }
+  .item-chip button:hover:not(:disabled){filter:brightness(1.25);}
+  .item-chip button:disabled{opacity:0.4; cursor:not-allowed;}
 
   /* --- Map view --- */
   .map-view{
@@ -126,27 +143,11 @@
   }
   .map-view.hidden{display:none;}
   .map-header{margin-bottom:8px;}
-  .map-header h2{
-    font-family:var(--font-display);
-    font-size:20px;
-    margin:0 0 4px;
-    letter-spacing:0.04em;
-  }
-  .map-header p{
-    margin:0;
-    font-size:12.5px;
-    color:var(--muted);
-    line-height:1.5;
-  }
+  .map-header h2{font-family:var(--font-display); font-size:20px; margin:0 0 4px; letter-spacing:0.04em;}
+  .map-header p{margin:0; font-size:12.5px; color:var(--muted); line-height:1.5;}
   .map-track{display:flex; flex-direction:column;}
   .map-floor{display:flex; flex-direction:column; align-items:center; gap:8px;}
-  .map-floor-label{
-    font-family:var(--font-mono);
-    font-size:10px;
-    letter-spacing:0.12em;
-    text-transform:uppercase;
-    color:var(--muted);
-  }
+  .map-floor-label{font-family:var(--font-mono); font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted);}
   .map-floor[data-status="current"] .map-floor-label{color:var(--gold);}
   .map-nodes{display:flex; gap:14px; justify-content:center; flex-wrap:wrap; width:100%;}
   .map-connector{width:2px; height:22px; background:linear-gradient(var(--ink-3), var(--ink-3)); margin:2px 0;}
@@ -169,47 +170,19 @@
     text-align:center;
   }
   .map-node--boss{border-color:var(--tier-5); box-shadow:0 0 14px rgba(192,68,111,0.25);}
-  .map-node .node-gem{
-    width:11px; height:11px;
-    border-radius:2px;
-    transform:rotate(45deg);
-    background:var(--node-color, var(--tier-1));
-    box-shadow:0 0 8px var(--node-color, var(--tier-1));
-  }
-  .map-node .node-len{
-    font-family:var(--font-mono);
-    font-size:15px;
-    font-weight:700;
-    color:var(--bone);
-  }
-  .map-node .node-tier{
-    font-size:10px;
-    letter-spacing:0.08em;
-    text-transform:uppercase;
-    color:var(--node-color, var(--tier-1));
-    font-weight:700;
-  }
-  .map-node .node-spoils{
-    font-family:var(--font-mono);
-    font-size:10.5px;
-    color:var(--muted);
-  }
+  .map-node--shop{border-style:dashed;}
+  .map-node .node-gem{width:11px; height:11px; border-radius:2px; transform:rotate(45deg); background:var(--node-color, var(--tier-1)); box-shadow:0 0 8px var(--node-color, var(--tier-1));}
+  .map-node .node-gem.coin{border-radius:50%; transform:none; background:var(--shop); box-shadow:0 0 8px var(--shop);}
+  .map-node .node-len{font-family:var(--font-mono); font-size:15px; font-weight:700; color:var(--bone);}
+  .map-node .node-tier{font-size:10px; letter-spacing:0.08em; text-transform:uppercase; color:var(--node-color, var(--tier-1)); font-weight:700;}
+  .map-node .node-tier.shop{color:var(--shop);}
+  .map-node .node-spoils{font-family:var(--font-mono); font-size:10.5px; color:var(--muted);}
   .map-node .node-badge{
-    position:absolute;
-    top:-8px; right:-8px;
-    width:22px; height:22px;
-    border-radius:50%;
-    display:flex; align-items:center; justify-content:center;
-    font-size:12px;
-    font-weight:700;
+    position:absolute; top:-8px; right:-8px; width:22px; height:22px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700;
     border:1px solid var(--ink-1);
   }
-  .map-node[data-status="current"]{
-    cursor:pointer;
-    border-color:var(--gold);
-    background:var(--ink-3);
-    color:var(--bone);
-  }
+  .map-node[data-status="current"]{cursor:pointer; border-color:var(--gold); background:var(--ink-3); color:var(--bone);}
   .map-node[data-status="current"]:hover{filter:brightness(1.12); transform:translateY(-1px);}
   .map-node[data-status="current"]:focus-visible{outline:2px solid var(--gold); outline-offset:2px;}
   .map-node[data-status="locked"]{opacity:0.38;}
@@ -218,6 +191,66 @@
   .map-node[data-status="resolved-won"] .node-badge{background:var(--tile-green); color:#0d150f;}
   .map-node[data-status="resolved-escaped"]{opacity:0.7; border-color:var(--crimson-dim);}
   .map-node[data-status="resolved-escaped"] .node-badge{background:var(--crimson-dim); color:var(--bone);}
+  .map-node[data-status="resolved-visited"]{opacity:0.7; border-color:var(--shop);}
+  .map-node[data-status="resolved-visited"] .node-badge{background:var(--shop); color:#241a05;}
+
+  /* --- Shop view --- */
+  .shop-view{
+    background:var(--ink-1);
+    border:1px solid var(--ink-3);
+    border-radius:var(--radius-m);
+    padding:20px;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
+  .shop-view.hidden{display:none;}
+  .shop-header h2{font-family:var(--font-display); font-size:22px; margin:0 0 4px; letter-spacing:0.04em; color:var(--shop);}
+  .shop-header p{margin:0; font-size:12.5px; color:var(--muted);}
+  .shop-offers{display:flex; flex-direction:column; gap:10px;}
+  .shop-offer{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    background:var(--ink-2);
+    border:1px solid var(--ink-3);
+    border-radius:var(--radius-m);
+    padding:12px 14px;
+  }
+  .shop-offer-info{display:flex; flex-direction:column; gap:2px;}
+  .shop-offer-name{font-weight:700; font-size:14px; color:var(--bone);}
+  .shop-offer-desc{font-size:11.5px; color:var(--muted);}
+  .shop-offer-buy{
+    font-family:var(--font-mono);
+    font-weight:700;
+    font-size:13px;
+    letter-spacing:0.03em;
+    background:var(--shop);
+    color:#241a05;
+    border:none;
+    border-radius:var(--radius-s);
+    padding:9px 16px;
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  .shop-offer-buy:hover:not(:disabled){filter:brightness(1.08);}
+  .shop-offer-buy:disabled{background:var(--ink-3); color:var(--muted); cursor:not-allowed;}
+  #shop-continue{
+    align-self:flex-end;
+    font-family:var(--font-body);
+    font-weight:700;
+    font-size:13px;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    background:var(--ink-3);
+    color:var(--bone);
+    border:none;
+    border-radius:var(--radius-s);
+    padding:10px 20px;
+    cursor:pointer;
+  }
+  #shop-continue:hover{filter:brightness(1.2);}
 
   /* --- Fight arena --- */
   .arena{display:flex; flex-direction:column; gap:18px;}
@@ -230,127 +263,45 @@
     padding:20px;
     display:flex;
     flex-direction:column;
-    gap:12px;
+    gap:10px;
     position:relative;
     overflow:hidden;
   }
-  .enemy-plaque::before{
-    content:"";
-    position:absolute;
-    inset:0;
-    background:var(--tier-color, var(--tier-1));
-    opacity:0.08;
-    pointer-events:none;
-  }
+  .enemy-plaque::before{content:""; position:absolute; inset:0; background:var(--tier-color, var(--tier-1)); opacity:0.08; pointer-events:none;}
   .tier-row{display:flex; align-items:center; gap:10px;}
-  .tier-gem{
-    width:12px; height:12px;
-    border-radius:2px;
-    background:var(--tier-color, var(--tier-1));
-    transform:rotate(45deg);
-    flex:none;
-    box-shadow:0 0 10px var(--tier-color, var(--tier-1));
-  }
-  .tier-label{
-    font-size:11px;
-    letter-spacing:0.12em;
-    text-transform:uppercase;
-    color:var(--tier-color, var(--tier-1));
-    font-weight:700;
-  }
-  .enemy-name{
-    font-family:var(--font-display);
-    font-size:clamp(20px,4vw,26px);
-    font-weight:700;
-    letter-spacing:0.05em;
-    margin:0;
-    color:var(--bone);
-  }
-  .enemy-stats-row{
-    display:flex;
-    gap:20px;
-    flex-wrap:wrap;
-    font-family:var(--font-mono);
-    font-size:12px;
-    color:var(--bone-dim);
-  }
+  .tier-gem{width:12px; height:12px; border-radius:2px; background:var(--tier-color, var(--tier-1)); transform:rotate(45deg); flex:none; box-shadow:0 0 10px var(--tier-color, var(--tier-1));}
+  .tier-label{font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--tier-color, var(--tier-1)); font-weight:700;}
+  .enemy-name{font-family:var(--font-display); font-size:clamp(20px,4vw,26px); font-weight:700; letter-spacing:0.05em; margin:0; color:var(--bone);}
+  .enemy-stats-row{display:flex; gap:20px; flex-wrap:wrap; font-family:var(--font-mono); font-size:12px; color:var(--bone-dim);}
   .enemy-stats-row strong{color:var(--bone); font-weight:600;}
-  .hp-bar-track{
-    width:100%;
-    height:10px;
-    background:var(--ink-2);
-    border-radius:5px;
-    overflow:hidden;
-    border:1px solid var(--ink-3);
-  }
-  .hp-bar-fill{
-    height:100%;
-    background:linear-gradient(90deg, var(--crimson), var(--gold));
-    width:100%;
-    transition:width 240ms ease;
-  }
-  .hp-numbers{
-    font-family:var(--font-mono);
-    font-variant-numeric:tabular-nums;
-    font-size:12px;
-    color:var(--bone-dim);
-    text-align:right;
-  }
+  .hp-bar-track{width:100%; height:10px; background:var(--ink-2); border-radius:5px; overflow:hidden; border:1px solid var(--ink-3);}
+  .hp-bar-fill{height:100%; background:linear-gradient(90deg, var(--crimson), var(--gold)); width:100%; transition:width 240ms ease;}
+  .hp-numbers{font-family:var(--font-mono); font-variant-numeric:tabular-nums; font-size:12px; color:var(--bone-dim); text-align:right;}
+  .known-letters{font-family:var(--font-mono); font-size:11.5px; color:var(--tier-3);}
+  .known-letters.hidden{display:none;}
 
-  .board{
-    display:flex;
-    flex-direction:column;
-    gap:8px;
-  }
-  .board-row{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    flex-wrap:wrap;
-  }
+  .board{display:flex; flex-direction:column; gap:8px;}
+  .board-row{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
   .tiles{display:flex; gap:6px;}
   .tile{
     width:38px; height:38px;
     display:flex; align-items:center; justify-content:center;
-    font-family:var(--font-mono);
-    font-weight:700;
-    font-size:17px;
-    text-transform:uppercase;
-    border-radius:var(--radius-s);
-    border:1px solid var(--ink-3);
-    background:var(--ink-2);
-    color:var(--bone-dim);
+    font-family:var(--font-mono); font-weight:700; font-size:17px; text-transform:uppercase;
+    border-radius:var(--radius-s); border:1px solid var(--ink-3); background:var(--ink-2); color:var(--bone-dim);
   }
   .tile[data-state="green"]{background:var(--tile-green); border-color:var(--tile-green); color:#0d150f;}
   .tile[data-state="yellow"]{background:var(--tile-gold); border-color:var(--tile-gold); color:#241a05;}
   .tile[data-state="gray"]{background:var(--tile-gray); border-color:var(--tile-gray); color:var(--muted);}
-  .row-damage{
-    font-family:var(--font-mono);
-    font-size:12px;
-    display:flex;
-    gap:10px;
-    white-space:nowrap;
-  }
+  .row-damage{font-family:var(--font-mono); font-size:12px; display:flex; gap:10px; white-space:nowrap;}
   .dmg-dealt{color:var(--gold);}
   .dmg-taken{color:var(--crimson);}
   .dmg-zero{color:var(--muted);}
 
-  .guess-row{
-    display:flex;
-    gap:10px;
-  }
+  .guess-row{display:flex; gap:10px;}
   #guess-input{
-    flex:1;
-    background:var(--ink-1);
-    border:1px solid var(--ink-3);
-    border-radius:var(--radius-s);
-    padding:12px 14px;
-    color:var(--bone);
-    font-family:var(--font-mono);
-    font-size:16px;
-    letter-spacing:0.08em;
-    text-transform:uppercase;
-    outline:none;
+    flex:1; background:var(--ink-1); border:1px solid var(--ink-3); border-radius:var(--radius-s);
+    padding:12px 14px; color:var(--bone); font-family:var(--font-mono); font-size:16px;
+    letter-spacing:0.08em; text-transform:uppercase; outline:none;
   }
   #guess-input::placeholder{color:var(--muted); text-transform:none; letter-spacing:normal;}
   #guess-input:focus{border-color:var(--gold); box-shadow:0 0 0 3px rgba(227,165,61,0.18);}
@@ -362,104 +313,44 @@
     40%,60%{transform:translateX(6px);}
   }
   #guess-submit{
-    font-family:var(--font-body);
-    font-weight:700;
-    font-size:14px;
-    letter-spacing:0.04em;
-    text-transform:uppercase;
-    background:var(--gold);
-    color:#241a05;
-    border:none;
-    border-radius:var(--radius-s);
-    padding:0 22px;
-    cursor:pointer;
+    font-family:var(--font-body); font-weight:700; font-size:14px; letter-spacing:0.04em; text-transform:uppercase;
+    background:var(--gold); color:#241a05; border:none; border-radius:var(--radius-s); padding:0 22px; cursor:pointer;
     transition:filter 120ms ease, transform 120ms ease;
   }
   #guess-submit:hover{filter:brightness(1.08);}
   #guess-submit:active{transform:translateY(1px);}
-  #guess-submit:focus-visible, button:focus-visible, input:focus-visible{
-    outline:2px solid var(--gold);
-    outline-offset:2px;
-  }
+  #guess-submit:focus-visible, button:focus-visible, input:focus-visible{outline:2px solid var(--gold); outline-offset:2px;}
   #guess-submit:disabled{background:var(--ink-3); color:var(--muted); cursor:not-allowed;}
 
-  .guess-meta{
-    margin:0;
-    font-family:var(--font-mono);
-    font-size:11px;
-    color:var(--muted);
-    text-align:right;
-  }
+  .guess-meta{margin:0; font-family:var(--font-mono); font-size:11px; color:var(--muted); text-align:right;}
 
   .log{
-    background:var(--ink-1);
-    border:1px solid var(--ink-3);
-    border-radius:var(--radius-m);
-    padding:12px 16px;
-    max-height:150px;
-    overflow-y:auto;
-    display:flex;
-    flex-direction:column-reverse;
-    gap:4px;
+    background:var(--ink-1); border:1px solid var(--ink-3); border-radius:var(--radius-m);
+    padding:12px 16px; max-height:150px; overflow-y:auto; display:flex; flex-direction:column-reverse; gap:4px;
   }
-  .log p{
-    margin:0;
-    font-size:12.5px;
-    color:var(--bone-dim);
-    line-height:1.5;
-  }
+  .log p{margin:0; font-size:12.5px; color:var(--bone-dim); line-height:1.5;}
   .log p.event-kill{color:var(--gold); font-weight:600;}
   .log p.event-danger{color:var(--crimson);}
+  .log p.event-shop{color:var(--shop);}
   .log::-webkit-scrollbar{width:8px;}
   .log::-webkit-scrollbar-thumb{background:var(--ink-3); border-radius:4px;}
 
   .end-banner{
-    width:100%;
-    max-width:640px;
-    background:var(--ink-1);
-    border:1px solid var(--ink-3);
-    border-radius:var(--radius-m);
-    padding:40px 32px;
-    text-align:center;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    gap:14px;
+    width:100%; max-width:640px; background:var(--ink-1); border:1px solid var(--ink-3); border-radius:var(--radius-m);
+    padding:40px 32px; text-align:center; display:flex; flex-direction:column; align-items:center; gap:14px;
   }
   .end-banner.hidden{display:none;}
-  .end-banner h1{
-    font-family:var(--font-display);
-    font-size:clamp(30px,6vw,48px);
-    margin:0;
-    letter-spacing:0.05em;
-  }
+  .end-banner h1{font-family:var(--font-display); font-size:clamp(30px,6vw,48px); margin:0; letter-spacing:0.05em;}
   .end-banner.victory h1{color:var(--gold);}
   .end-banner.defeat h1{color:var(--crimson);}
   .end-banner p{margin:0; color:var(--bone-dim); font-size:14px;}
-  .end-stats{
-    display:grid;
-    grid-template-columns:repeat(2,minmax(120px,1fr));
-    gap:12px 28px;
-    margin:10px 0;
-    width:100%;
-    max-width:400px;
-  }
+  .end-stats{display:grid; grid-template-columns:repeat(2,minmax(120px,1fr)); gap:12px 28px; margin:10px 0; width:100%; max-width:400px;}
   .end-stat{display:flex; flex-direction:column; gap:2px;}
   .end-stat .label{font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted);}
   .end-stat .value{font-family:var(--font-mono); font-size:18px; font-weight:700; color:var(--bone);}
   #restart-btn{
-    font-family:var(--font-body);
-    font-weight:700;
-    font-size:14px;
-    letter-spacing:0.04em;
-    text-transform:uppercase;
-    background:var(--gold);
-    color:#241a05;
-    border:none;
-    border-radius:var(--radius-s);
-    padding:12px 28px;
-    cursor:pointer;
-    margin-top:8px;
+    font-family:var(--font-body); font-weight:700; font-size:14px; letter-spacing:0.04em; text-transform:uppercase;
+    background:var(--gold); color:#241a05; border:none; border-radius:var(--radius-s); padding:12px 28px; cursor:pointer; margin-top:8px;
   }
   #restart-btn:hover{filter:brightness(1.08);}
 
@@ -467,33 +358,49 @@
     .tile{width:30px; height:30px; font-size:14px;}
     .enemy-stats-row{gap:12px;}
     .map-node{width:100px; padding:10px 6px 8px;}
+    .shop-offer{flex-direction:column; align-items:stretch; text-align:center;}
   }
 </style>
 
 <div class="masthead">
-  <h1>Lexicon Arena</h1>
+  <h1>Lexicon Hero</h1>
   <p>Wordle Roguelite — battle-math test build</p>
 </div>
 
 <div class="shell">
   <div class="topbar">
-    <div class="run-progress">
+    <div class="stat-block">
       <span class="eyebrow">Floor</span>
-      <span class="progress-value" id="progress-value">1 / 6</span>
+      <span class="stat-value" id="progress-value">1 / 9</span>
     </div>
-    <div class="spoils-stat">
+    <div class="stat-block">
       <span class="eyebrow">Spoils</span>
-      <span class="spoils-value" id="spoils-value">0</span>
+      <span class="stat-value gold" id="spoils-value">0</span>
+    </div>
+    <div class="stat-block">
+      <span class="eyebrow">Shield</span>
+      <span class="stat-value steel" id="shield-value">0</span>
     </div>
     <div class="hearts" id="hearts"></div>
   </div>
 
+  <div class="inventory-bar hidden" id="inventory-bar"></div>
+
   <div class="map-view" id="map-view">
     <div class="map-header">
       <h2>Choose your path</h2>
-      <p>Same length = same effort to kill (equal HP). Higher tier hits harder each round but pays more spoils. Pick your risk.</p>
+      <p>Same length = same effort to kill (equal HP). Higher tier hits harder each round but pays more spoils. Shops (dashed) let you spend spoils instead of fighting.</p>
     </div>
     <div class="map-track" id="map-track"></div>
+  </div>
+
+  <div class="shop-view hidden" id="shop-view">
+    <div class="shop-header">
+      <h2>The Peddler's Pack</h2>
+      <p>Spend spoils now — armor equips immediately, potions and orbs go in your pack for later.</p>
+    </div>
+    <div class="shop-offers" id="shop-offers"></div>
+    <button id="shop-continue" type="button">Continue on the path</button>
   </div>
 
   <div class="arena hidden" id="arena">
@@ -510,6 +417,7 @@
         <span>Attack after 1st guess: <strong id="stat-attack">1</strong> dmg / round</span>
         <span>Spoils on kill: <strong id="stat-spoils">4</strong></span>
       </div>
+      <p class="known-letters hidden" id="known-letters"></p>
     </div>
 
     <div class="board" id="board"></div>
@@ -553,51 +461,96 @@
   };
 
   // Each floor is either a single fixed encounter (start / boss) or a
-  // branching choice of 2 encounters with equal length (equal HP) but
-  // different obscurity tier (different attack + spoils).
-  var FLOORS = [
+  // branching choice of 2-3 encounters, generally matched on length
+  // (equal HP) but differing in obscurity tier (attack + spoils).
+  var FLOOR_DEFS = [
     { fixed: [ { word: 'cat', tier: 1 } ] },
     { choices: [ { word: 'fish', tier: 1 }, { word: 'glum', tier: 2 } ] },
-    { choices: [ { word: 'brisk', tier: 2 }, { word: 'glyph', tier: 3 } ] },
+    { choices: [ { word: 'brisk', tier: 2 }, { word: 'glyph', tier: 3 }, { word: 'phlox', tier: 5 } ] },
+    { choices: [ { word: 'table', tier: 1 }, { word: 'epoxy', tier: 4 } ] },
     { choices: [ { word: 'gambit', tier: 3 }, { word: 'quartz', tier: 4 } ] },
+    { choices: [ { word: 'gadget', tier: 1 }, { word: 'oxalis', tier: 5 } ] },
     { choices: [ { word: 'phoenix', tier: 4 }, { word: 'zygotic', tier: 5 } ] },
+    { choices: [ { word: 'jackpot', tier: 1 }, { word: 'paradox', tier: 3 } ] },
     { fixed: [ { word: 'quixotic', tier: 5, boss: true } ] }
-  ].map(function(floorDef, floorIndex){
-    var raw = floorDef.fixed || floorDef.choices;
-    var isFixed = !!floorDef.fixed;
-    var options = raw.map(function(opt, choiceIndex){
-      var length = opt.word.length;
-      return {
-        word: opt.word,
-        length: length,
-        tier: opt.tier,
-        boss: !!opt.boss,
-        hp: length * 2,
-        atk: opt.tier,
-        spoils: length + opt.tier,
-        floorIndex: floorIndex,
-        choiceIndex: choiceIndex
-      };
-    });
-    return { isFixed: isFixed, options: options, boss: options[0].boss };
-  });
+  ];
+
+  var SHOP_CATALOG = [
+    { kind: 'armor',  value: 3, cost: 4, name: 'Armor 3',            desc: 'Absorbs the next 3 damage before it breaks.' },
+    { kind: 'armor',  value: 6, cost: 8, name: 'Armor 6',            desc: 'Absorbs the next 6 damage before it breaks.' },
+    { kind: 'potion', value: 2, cost: 3, name: 'Healing Potion 2',   desc: 'Use anytime to heal 2 HP.' },
+    { kind: 'potion', value: 4, cost: 6, name: 'Healing Potion 4',   desc: 'Use anytime to heal 4 HP.' },
+    { kind: 'orb',    value: 1, cost: 3, name: 'Orb of Knowledge 1', desc: 'Reveals 1 letter in the word — not its position. Fight only.' },
+    { kind: 'orb',    value: 2, cost: 5, name: 'Orb of Knowledge 2', desc: 'Reveals 2 letters in the word — not their position. Fight only.' }
+  ];
 
   var MAX_HEARTS = 6;
   var MAX_HP = MAX_HEARTS * 2;
   var MAX_GUESSES = 6;
+  var SHOP_FLOOR_COUNT = 2;
+  var SHOP_OFFER_COUNT = 3;
 
   var state = null;
   var fight = null;
+  var floors = null;          // this run's floor layout (fight/shop slots)
+  var currentShopOpt = null;
+  var currentOffers = null;
+
+  function shuffle(arr){
+    for (var i = arr.length - 1; i > 0; i--){
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
+    }
+    return arr;
+  }
+
+  function buildFloors(){
+    var built = FLOOR_DEFS.map(function(def, floorIndex){
+      var isFixed = !!def.fixed;
+      var raw = def.fixed || def.choices;
+      var options = raw.map(function(opt, choiceIndex){
+        var length = opt.word.length;
+        return {
+          type: 'fight',
+          word: opt.word,
+          length: length,
+          tier: opt.tier,
+          boss: !!opt.boss,
+          hp: length * 2,
+          atk: opt.tier,
+          spoils: length + opt.tier,
+          floorIndex: floorIndex,
+          choiceIndex: choiceIndex
+        };
+      });
+      return { isFixed: isFixed, boss: options[0].boss, options: options };
+    });
+
+    var eligible = [];
+    built.forEach(function(f, i){ if (!f.isFixed) eligible.push(i); });
+    shuffle(eligible);
+    var shopCount = Math.min(SHOP_FLOOR_COUNT, eligible.length);
+    for (var s = 0; s < shopCount; s++){
+      var fi = eligible[s];
+      var opts = built[fi].options;
+      var slot = Math.floor(Math.random() * opts.length);
+      opts[slot] = { type: 'shop', floorIndex: fi, choiceIndex: slot };
+    }
+    return built;
+  }
 
   function freshRunState(){
     return {
       mapIndex: 0,
       playerHP: MAX_HP,
+      shield: 0,
       spoils: 0,
+      inventory: [],
+      nextItemId: 1,
       totalDealt: 0,
       totalTaken: 0,
       fightsCleared: 0,
-      resolutions: new Array(FLOORS.length).fill(null),
+      resolutions: new Array(FLOOR_DEFS.length).fill(null),
       ended: false
     };
   }
@@ -605,9 +558,11 @@
   // ---------- shared chrome ----------
 
   function renderTopbar(){
-    document.getElementById('progress-value').textContent = (state.mapIndex + 1) + ' / ' + FLOORS.length;
+    document.getElementById('progress-value').textContent = (state.mapIndex + 1) + ' / ' + floors.length;
     document.getElementById('spoils-value').textContent = state.spoils;
+    document.getElementById('shield-value').textContent = state.shield;
     renderHearts();
+    renderInventory();
   }
 
   function renderHearts(){
@@ -630,11 +585,59 @@
       '</svg>';
   }
 
+  function renderInventory(){
+    var bar = document.getElementById('inventory-bar');
+    bar.innerHTML = '';
+    if (!state.inventory.length){
+      bar.classList.add('hidden');
+      return;
+    }
+    bar.classList.remove('hidden');
+    state.inventory.forEach(function(item){
+      var chip = document.createElement('div');
+      chip.className = 'item-chip';
+      chip.setAttribute('data-kind', item.kind);
+      var label = item.kind === 'potion' ? ('Potion +' + item.value + ' HP') : ('Orb x' + item.value);
+      var btnLabel = item.kind === 'potion' ? 'Drink' : 'Use';
+      var canUse = item.kind === 'potion' || (item.kind === 'orb' && !!fight);
+      chip.innerHTML =
+        '<span class="item-dot"></span><span>' + label + '</span>' +
+        '<button type="button"' + (canUse ? '' : ' disabled title="Only usable during a fight"') + '>' + btnLabel + '</button>';
+      chip.querySelector('button').addEventListener('click', function(){ useItem(item.id); });
+      bar.appendChild(chip);
+    });
+  }
+
+  function useItem(itemId){
+    var idx = state.inventory.findIndex(function(it){ return it.id === itemId; });
+    if (idx === -1) return;
+    var item = state.inventory[idx];
+    if (item.kind === 'potion'){
+      var before = state.playerHP;
+      state.playerHP = Math.min(MAX_HP, state.playerHP + item.value);
+      state.inventory.splice(idx, 1);
+      log('Drank a potion — healed ' + (state.playerHP - before) + ' HP.', 'event-kill');
+      renderTopbar();
+    } else if (item.kind === 'orb'){
+      if (!fight) return;
+      var secretLetters = Array.from(new Set(fight.enc.word.split('')));
+      var unknown = secretLetters.filter(function(l){ return !fight.knownLetters.has(l); });
+      shuffle(unknown);
+      var reveal = unknown.slice(0, item.value);
+      reveal.forEach(function(l){ fight.knownLetters.add(l); });
+      state.inventory.splice(idx, 1);
+      log('Used an Orb of Knowledge — revealed: ' + (reveal.length ? reveal.join(', ').toUpperCase() : 'nothing new') + '.', 'event-kill');
+      renderKnownLetters();
+      renderInventory();
+    }
+  }
+
   // ---------- map view ----------
 
   function showMap(){
     fight = null;
     document.getElementById('arena').classList.add('hidden');
+    document.getElementById('shop-view').classList.add('hidden');
     document.getElementById('end-banner').classList.add('hidden');
     document.getElementById('map-view').classList.remove('hidden');
     renderTopbar();
@@ -645,7 +648,7 @@
     var track = document.getElementById('map-track');
     track.innerHTML = '';
 
-    FLOORS.forEach(function(floor, floorIndex){
+    floors.forEach(function(floor, floorIndex){
       if (floorIndex > 0){
         var connector = document.createElement('div');
         connector.className = 'map-connector';
@@ -670,13 +673,14 @@
       floor.options.forEach(function(opt){
         var btn = document.createElement('button');
         btn.type = 'button';
-        btn.className = 'map-node' + (opt.boss ? ' map-node--boss' : '');
-        btn.style.setProperty('--node-color', TIERS[opt.tier].color);
+        var isShop = opt.type === 'shop';
+        btn.className = 'map-node' + (opt.boss ? ' map-node--boss' : '') + (isShop ? ' map-node--shop' : '');
+        if (!isShop) btn.style.setProperty('--node-color', TIERS[opt.tier].color);
 
         var status;
         if (floorIndex < state.mapIndex){
           if (resolution && resolution.choiceIndex === opt.choiceIndex){
-            status = resolution.result === 'won' ? 'resolved-won' : 'resolved-escaped';
+            status = resolution.result === 'won' ? 'resolved-won' : (resolution.result === 'visited' ? 'resolved-visited' : 'resolved-escaped');
           } else {
             status = 'not-taken';
           }
@@ -690,16 +694,26 @@
         var badgeHtml = '';
         if (status === 'resolved-won') badgeHtml = '<span class="node-badge">✓</span>';
         if (status === 'resolved-escaped') badgeHtml = '<span class="node-badge">↯</span>';
+        if (status === 'resolved-visited') badgeHtml = '<span class="node-badge">$</span>';
 
-        btn.innerHTML =
-          '<span class="node-gem"></span>' +
-          '<span class="node-len">L' + opt.length + '</span>' +
-          '<span class="node-tier">' + TIERS[opt.tier].name + '</span>' +
-          '<span class="node-spoils">' + opt.hp + ' HP · +' + opt.spoils + ' spoils</span>' +
-          badgeHtml;
+        if (isShop){
+          btn.innerHTML =
+            '<span class="node-gem coin"></span>' +
+            '<span class="node-len">Shop</span>' +
+            '<span class="node-tier shop">Peddler</span>' +
+            '<span class="node-spoils">spend spoils</span>' +
+            badgeHtml;
+        } else {
+          btn.innerHTML =
+            '<span class="node-gem"></span>' +
+            '<span class="node-len">L' + opt.length + '</span>' +
+            '<span class="node-tier">' + TIERS[opt.tier].name + '</span>' +
+            '<span class="node-spoils">' + opt.hp + ' HP · +' + opt.spoils + ' spoils</span>' +
+            badgeHtml;
+        }
 
         if (status === 'current'){
-          btn.addEventListener('click', function(){ chooseNode(opt); });
+          btn.addEventListener('click', function(){ selectNode(opt); });
         } else {
           btn.disabled = true;
         }
@@ -712,10 +726,74 @@
     });
   }
 
-  function chooseNode(opt){
+  function selectNode(opt){
+    if (opt.type === 'shop'){
+      openShop(opt);
+      return;
+    }
     document.getElementById('map-view').classList.add('hidden');
     document.getElementById('arena').classList.remove('hidden');
     startFight(opt);
+  }
+
+  // ---------- shop ----------
+
+  function openShop(opt){
+    currentShopOpt = opt;
+    document.getElementById('map-view').classList.add('hidden');
+    document.getElementById('shop-view').classList.remove('hidden');
+    var pool = SHOP_CATALOG.slice();
+    shuffle(pool);
+    currentOffers = pool.slice(0, SHOP_OFFER_COUNT).map(function(tpl, i){
+      return Object.assign({ offerId: i, purchased: false }, tpl);
+    });
+    renderShop();
+    log('Stepped into the peddler’s shop.', 'event-shop');
+  }
+
+  function renderShop(){
+    var wrap = document.getElementById('shop-offers');
+    wrap.innerHTML = '';
+    currentOffers.forEach(function(offer){
+      var row = document.createElement('div');
+      row.className = 'shop-offer';
+      var canAfford = state.spoils >= offer.cost && !offer.purchased;
+      row.innerHTML =
+        '<div class="shop-offer-info">' +
+          '<span class="shop-offer-name">' + offer.name + '</span>' +
+          '<span class="shop-offer-desc">' + offer.desc + '</span>' +
+        '</div>' +
+        '<button class="shop-offer-buy" type="button"' + (canAfford ? '' : ' disabled') + '>' +
+          (offer.purchased ? 'Sold' : offer.cost + ' spoils') +
+        '</button>';
+      row.querySelector('button').addEventListener('click', function(){ buyOffer(offer); });
+      wrap.appendChild(row);
+    });
+  }
+
+  function buyOffer(offer){
+    if (offer.purchased || state.spoils < offer.cost) return;
+    state.spoils -= offer.cost;
+    offer.purchased = true;
+    if (offer.kind === 'armor'){
+      state.shield += offer.value;
+      log('Bought ' + offer.name + ' — shield is now ' + state.shield + '.', 'event-shop');
+    } else {
+      state.inventory.push({ id: state.nextItemId++, kind: offer.kind, value: offer.value });
+      log('Bought ' + offer.name + ' — added to your pack.', 'event-shop');
+    }
+    renderTopbar();
+    renderShop();
+  }
+
+  function leaveShop(){
+    var opt = currentShopOpt;
+    state.resolutions[opt.floorIndex] = { choiceIndex: opt.choiceIndex, result: 'visited' };
+    currentShopOpt = null;
+    currentOffers = null;
+    state.mapIndex++;
+    document.getElementById('shop-view').classList.add('hidden');
+    showMap();
   }
 
   // ---------- fight ----------
@@ -725,11 +803,14 @@
       enc: enc,
       enemyHP: enc.hp,
       bestState: new Array(enc.length).fill('unknown'),
+      knownLetters: new Set(),
       guessesUsed: 0
     };
     document.getElementById('board').innerHTML = '';
     renderEnemyPlaque();
+    renderKnownLetters();
     renderGuessMeta();
+    renderInventory();
     log((enc.boss ? 'The boss appears: ' : 'A challenger appears: ') + 'a ' + enc.length + '-letter ' + TIERS[enc.tier].name.toLowerCase() + ' word.', 'event-kill');
     document.getElementById('guess-input').setAttribute('maxlength', enc.length);
     document.getElementById('guess-input').value = '';
@@ -750,6 +831,17 @@
     document.getElementById('stat-attack').textContent = enc.atk;
     document.getElementById('stat-spoils').textContent = enc.spoils;
     updateHPBar();
+  }
+
+  function renderKnownLetters(){
+    var el = document.getElementById('known-letters');
+    if (!fight.knownLetters.size){
+      el.classList.add('hidden');
+      el.textContent = '';
+      return;
+    }
+    el.classList.remove('hidden');
+    el.textContent = 'Known letters (no position): ' + Array.from(fight.knownLetters).join(', ').toUpperCase();
   }
 
   function updateHPBar(){
@@ -847,25 +939,35 @@
     var enemyDefeated = fight.enemyHP <= 0 || isSolve;
 
     var retaliation = 0;
+    var absorbed = 0;
     if (!enemyDefeated && fight.guessesUsed > 1){
       retaliation = enc.atk;
-      state.playerHP = Math.max(0, state.playerHP - retaliation);
-      state.totalTaken += retaliation;
+      absorbed = Math.min(state.shield, retaliation);
+      state.shield -= absorbed;
+      var through = retaliation - absorbed;
+      if (through > 0){
+        state.playerHP = Math.max(0, state.playerHP - through);
+        state.totalTaken += through;
+      }
     }
 
     updateHPBar();
-    renderHearts();
+    renderTopbar();
 
     var logMsg = 'Guess ' + fight.guessesUsed + ': ' + guess.toUpperCase() + ' → ' + dmg + ' dmg dealt';
-    if (retaliation > 0) logMsg += ', enemy strikes for ' + retaliation;
-    else if (fight.guessesUsed === 1) logMsg += ' (wind-up round, no retaliation)';
+    if (retaliation > 0){
+      logMsg += ', enemy strikes for ' + retaliation;
+      if (absorbed > 0) logMsg += ' (' + absorbed + ' absorbed by armor)';
+    } else if (fight.guessesUsed === 1){
+      logMsg += ' (wind-up round, no retaliation)';
+    }
     log(logMsg, isSolve ? 'event-kill' : (retaliation > 0 ? 'event-danger' : ''));
 
     document.getElementById('guess-input').value = '';
 
     if (state.playerHP <= 0){
-      recordResolution('escaped', false);
-      endRun(false, 'Fell at floor ' + (state.mapIndex + 1) + ' of ' + FLOORS.length + '.');
+      state.resolutions[enc.floorIndex] = { choiceIndex: enc.choiceIndex, result: 'escaped' };
+      endRun(false, 'Fell at floor ' + (state.mapIndex + 1) + ' of ' + floors.length + '.');
       return;
     }
 
@@ -892,12 +994,11 @@
     state.resolutions[enc.floorIndex] = { choiceIndex: enc.choiceIndex, result: result };
 
     var wasBoss = enc.boss;
-
-    if (!mayAdvance) return; // death already ends the run elsewhere
+    if (!mayAdvance) return;
 
     if (wasBoss){
       if (result === 'won'){
-        endRun(true, 'Cleared all ' + FLOORS.length + ' floors — the boss falls.');
+        endRun(true, 'Cleared all ' + floors.length + ' floors — the boss falls.');
       } else {
         endRun(false, 'Reached the boss and survived, but it slipped away unsolved.', 'Boss Escaped');
       }
@@ -940,6 +1041,7 @@
     state.ended = true;
     document.getElementById('arena').classList.add('hidden');
     document.getElementById('map-view').classList.add('hidden');
+    document.getElementById('shop-view').classList.add('hidden');
     var banner = document.getElementById('end-banner');
     banner.classList.remove('hidden', 'victory', 'defeat');
     banner.classList.add(victory ? 'victory' : 'defeat');
@@ -947,9 +1049,12 @@
     document.getElementById('end-subtitle').textContent = subtitle;
     var stats = document.getElementById('end-stats');
     stats.innerHTML = '';
+    var resolvedCount = state.resolutions.filter(function(r){ return r !== null; }).length;
     var entries = [
-      ['Fights cleared', state.fightsCleared + ' / ' + FLOORS.length],
+      ['Fights won', state.fightsCleared],
+      ['Floors cleared', resolvedCount + ' / ' + floors.length],
       ['Spoils earned', state.spoils],
+      ['Shield remaining', state.shield],
       ['Damage dealt', state.totalDealt],
       ['Damage taken', state.totalTaken],
       ['HP remaining', Math.max(0, state.playerHP) + ' / ' + MAX_HP]
@@ -966,6 +1071,7 @@
 
   function startRun(){
     state = freshRunState();
+    floors = buildFloors();
     document.getElementById('end-banner').classList.add('hidden');
     document.getElementById('log').innerHTML = '';
     showMap();
@@ -979,6 +1085,7 @@
     handleGuess(input.value);
   });
 
+  document.getElementById('shop-continue').addEventListener('click', leaveShop);
   document.getElementById('restart-btn').addEventListener('click', startRun);
 
   startRun();
