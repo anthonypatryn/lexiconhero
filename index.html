@@ -265,6 +265,37 @@
   }
   .current-option strong{color:var(--bone);}
 
+  .word-log{
+    display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:4px;
+  }
+  .word-log-col{
+    background:var(--ink-1); border:1px solid var(--ink-3); border-radius:var(--radius-s);
+    padding:10px 12px; display:flex; flex-direction:column; gap:6px; min-width:0;
+  }
+  .word-log-title{
+    font-family:var(--font-display); font-size:11px; letter-spacing:0.1em; text-transform:uppercase;
+    display:flex; align-items:center; gap:6px;
+  }
+  .word-log-title .count{font-family:var(--font-mono); color:var(--muted); font-weight:400; letter-spacing:normal;}
+  .word-log-col.defeated .word-log-title{color:var(--tile-green);}
+  .word-log-col.escaped .word-log-title{color:var(--crimson);}
+  .word-log-list{
+    list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:3px;
+    max-height:120px; overflow-y:auto;
+  }
+  .word-log-list::-webkit-scrollbar{width:6px;}
+  .word-log-list::-webkit-scrollbar-thumb{background:var(--ink-3); border-radius:3px;}
+  .word-log-empty{font-size:11.5px; color:var(--muted); font-style:italic;}
+  .word-log-item{
+    display:flex; align-items:baseline; justify-content:space-between; gap:8px;
+    font-family:var(--font-mono); font-size:12px; color:var(--bone-dim);
+  }
+  .word-log-item .w{color:var(--bone); letter-spacing:0.03em;}
+  .word-log-item .tag{font-size:10px; color:var(--muted); white-space:nowrap;}
+  @media (max-width:520px){
+    .word-log{grid-template-columns:1fr;}
+  }
+
   /* --- Shop view --- */
   .shop-view{
     background:var(--ink-1);
@@ -584,6 +615,17 @@
       </div>
     </div>
     <div class="map-current-info" id="map-current-info"></div>
+
+    <div class="word-log">
+      <div class="word-log-col defeated">
+        <div class="word-log-title">Defeated <span class="count" id="word-log-defeated-count">(0)</span></div>
+        <ul class="word-log-list" id="word-log-defeated"></ul>
+      </div>
+      <div class="word-log-col escaped">
+        <div class="word-log-title">Ran Away <span class="count" id="word-log-escaped-count">(0)</span></div>
+        <ul class="word-log-list" id="word-log-escaped"></ul>
+      </div>
+    </div>
   </div>
 
   <div class="shop-view hidden" id="shop-view">
@@ -993,7 +1035,9 @@
       pendingWingsItemId: null,
       maxGuessesMultiplier: 1,
       duelWield: false,
-      ended: false
+      ended: false,
+      defeatedWords: [],
+      escapedWords: []
     };
   }
 
@@ -1350,6 +1394,36 @@
     document.getElementById('map-view').classList.remove('hidden');
     renderTopbar();
     renderMap();
+    renderWordLog();
+  }
+
+  // Two running lists on the main map screen: words actually solved (spoils
+  // awarded) and words that got away (guesses ran out before the exact word
+  // was spoken, even ones ground down to 0 HP first). Newest first.
+  function renderWordLog(){
+    function fill(listId, countId, words, emptyMsg){
+      var listEl = document.getElementById(listId);
+      document.getElementById(countId).textContent = '(' + words.length + ')';
+      listEl.innerHTML = '';
+      if (!words.length){
+        var li = document.createElement('li');
+        li.className = 'word-log-empty';
+        li.textContent = emptyMsg;
+        listEl.appendChild(li);
+        return;
+      }
+      words.slice().reverse().forEach(function(entry){
+        var li = document.createElement('li');
+        li.className = 'word-log-item';
+        var tierName = TIERS[entry.tier] ? TIERS[entry.tier].name : '';
+        var kind = entry.type === 'boss' ? 'Boss' : (entry.type === 'elite' ? 'Elite' : '');
+        li.innerHTML = '<span class="w">' + entry.word.toUpperCase() + '</span>' +
+          '<span class="tag">' + [kind, tierName].filter(Boolean).join(' · ') + '</span>';
+        listEl.appendChild(li);
+      });
+    }
+    fill('word-log-defeated', 'word-log-defeated-count', state.defeatedWords, 'None yet.');
+    fill('word-log-escaped', 'word-log-escaped-count', state.escapedWords, 'None yet.');
   }
 
   function nodeLabel(node){
@@ -1569,7 +1643,8 @@
       knownLetters: new Set(),
       telescoped: {},
       guessesUsed: 0,
-      totalDamage: 0
+      totalDamage: 0,
+      overkillXpTotal: 0
     };
     renderBoardSkeleton(node.length);
     renderEnemyPlaque();
@@ -1705,22 +1780,36 @@
       }
     }
     var isSolve = (guess === node.word);
-    // Duel Wield's bigger green hits can deal more than the enemy has left
-    // without an exact solve — that excess would otherwise just be wasted.
-    var overkillXp = (state.duelWield && !isSolve && dmg > fight.enemyHP) ? (dmg - fight.enemyHP) : 0;
-    if (isSolve) dmg = fight.enemyHP;
+    var hpBefore = fight.enemyHP;
 
-    fight.enemyHP -= dmg;
-    fight.totalDamage += dmg;
-    state.totalDealt += dmg;
+    // Only actually speaking the exact word ends the fight. Tile damage
+    // alone can still whittle HP to 0 (or, with Duel Wield's bigger green
+    // hits, past 0) without ever having guessed the real word in one line —
+    // that no longer auto-wins the fight. The enemy just can't hit back
+    // anymore once its HP is spent; whatever damage would've gone to waste
+    // below 0 converts straight into bonus XP instead.
+    var appliedDmg, overkillXp = 0;
+    if (isSolve){
+      appliedDmg = fight.enemyHP;
+    } else if (dmg > fight.enemyHP){
+      overkillXp = dmg - Math.max(0, fight.enemyHP);
+      appliedDmg = Math.max(0, fight.enemyHP);
+    } else {
+      appliedDmg = dmg;
+    }
 
-    fillBoardRow(fight.guessesUsed - 1, colors, guess, dmg, isSolve);
+    fight.enemyHP -= appliedDmg;
+    fight.totalDamage += appliedDmg;
+    state.totalDealt += appliedDmg;
 
-    var enemyDefeated = fight.enemyHP <= 0 || isSolve;
+    fillBoardRow(fight.guessesUsed - 1, colors, guess, appliedDmg, isSolve);
+
+    var beaten = fight.enemyHP <= 0;
+    var justBeaten = beaten && hpBefore > 0;
 
     var retaliation = 0;
     var absorbed = 0;
-    if (!enemyDefeated && fight.guessesUsed > 1){
+    if (!beaten && fight.guessesUsed > 1){
       retaliation = node.atk;
       absorbed = Math.min(state.shield, retaliation);
       state.shield -= absorbed;
@@ -1734,12 +1823,14 @@
     updateHPBar();
     renderTopbar();
 
-    var logMsg = 'Guess ' + fight.guessesUsed + ': ' + guess.toUpperCase() + ' → ' + dmg + ' dmg dealt';
+    var logMsg = 'Guess ' + fight.guessesUsed + ': ' + guess.toUpperCase() + ' → ' + appliedDmg + ' dmg dealt';
     if (retaliation > 0){
       logMsg += ', enemy strikes for ' + retaliation;
       if (absorbed > 0) logMsg += ' (' + absorbed + ' absorbed by armor)';
     } else if (fight.guessesUsed === 1){
       logMsg += ' (wind-up round, no retaliation)';
+    } else if (beaten && !isSolve){
+      logMsg += ' (already beaten — no retaliation)';
     }
     log(logMsg, isSolve ? 'event-kill' : (retaliation > 0 ? 'event-danger' : ''));
 
@@ -1751,17 +1842,28 @@
 
     if (overkillXp > 0){
       earnXp(overkillXp);
+      fight.overkillXpTotal += overkillXp;
       log('Overkill! ' + overkillXp + ' excess damage converted to ' + overkillXp + ' bonus XP.', 'event-kill');
     }
 
-    if (enemyDefeated){
-      log(isSolve ? 'Solved outright — instant kill!' : 'Worn down to 0 HP — defeated!', 'event-kill');
-      showFightResult(node, isSolve, overkillXp);
+    if (isSolve){
+      log(hpBefore > 0 ? 'Solved outright — instant kill!' : 'Named at last — the beaten word falls!', 'event-kill');
+      showFightResult(node, hpBefore <= 0, fight.overkillXpTotal);
       return;
     }
 
+    if (justBeaten){
+      log('Worn down to 0 HP — it can\'t fight back anymore, but you still have to speak its name to finish it off.', 'event-kill');
+    }
+
     if (fight.guessesUsed >= effectiveMaxGuesses()){
-      log('Out of guesses — the word slips away unsolved. No reward this fight.', 'event-danger');
+      log('Out of guesses — the word slips away unsolved.' + (beaten ? ' It was already beaten — you keep the XP earned grinding it down, but no spoils.' : ' No reward this fight.'), 'event-danger');
+      // advanceFromNode() finishes on a setTimeout (map transition / floor
+      // change), leaving a brief window where the guess form is still live.
+      // Clear `fight` now, synchronously, so a fast double-submit in that
+      // window can't re-trigger advanceFromNode a second time.
+      document.getElementById('guess-input').blur();
+      fight = null;
       advanceFromNode(node, 'escaped');
       return;
     }
@@ -1773,18 +1875,20 @@
   // before actually advancing — makes a kill feel like an event instead of
   // silently dumping the player back on the map. Continue triggers the real
   // advanceFromNode(), which is where spoils/XP/floor-transition logic lives.
-  function showFightResult(node, isSolve, overkillXp){
+  function showFightResult(node, wasAlreadyBeaten, totalOverkillXp){
     var tier = TIERS[node.tier];
     document.getElementById('fight-result-card').style.setProperty('--tier-color', tier.color);
     document.getElementById('fr-eyebrow').textContent = node.type === 'boss' ? 'Boss defeated' : (node.type === 'elite' ? 'Elite defeated' : 'Word defeated');
     document.getElementById('fr-word').textContent = node.word.toUpperCase();
-    document.getElementById('fr-subtitle').textContent = isSolve ? 'Solved outright — instant kill' : 'Worn down to 0 HP';
+    document.getElementById('fr-subtitle').textContent = wasAlreadyBeaten
+      ? 'Ground down, then named — the word falls'
+      : 'Solved outright — instant kill';
 
     var statRows = [
       ['Guesses used', fight.guessesUsed + ' / ' + effectiveMaxGuesses()],
       ['Damage dealt', (fight.totalDamage || 0) + ' dmg'],
       ['Spoils earned', '+' + node.spoils],
-      ['XP earned', '+' + (node.spoils + overkillXp) + (overkillXp > 0 ? ' (incl. overkill)' : '')]
+      ['XP earned', '+' + (node.spoils + totalOverkillXp) + (totalOverkillXp > 0 ? ' (incl. overkill)' : '')]
     ];
     var statsEl = document.getElementById('fr-stats');
     statsEl.innerHTML = '';
@@ -1809,6 +1913,9 @@
       state.spoils += node.spoils;
       state.fightsCleared++;
       earnXp(node.spoils); // same length+tier formula as Spoils, banked across runs
+      state.defeatedWords.push({ word: node.word, length: node.length, tier: node.tier, type: node.type });
+    } else if (result === 'escaped'){
+      state.escapedWords.push({ word: node.word, length: node.length, tier: node.tier, type: node.type });
     }
     state.visited[node.id] = result;
     advanceCursor(node);
