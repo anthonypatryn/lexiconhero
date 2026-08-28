@@ -1,3 +1,8 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Lexicon Hero</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Manrope:wght@400;500;600;700;800&family=Martian+Mono:wght@400;500;600;700&display=swap">
 <style>
@@ -170,6 +175,11 @@
   .debug-row button:hover{border-color:var(--gold); color:var(--gold);}
   .debug-row button.danger:hover{border-color:var(--crimson); color:var(--crimson);}
   #debug-word-out{font-family:var(--font-mono); color:var(--gold); font-size:13px; letter-spacing:0.1em;}
+  #debug-tools{display:flex; flex-direction:column; gap:10px;}
+  #debug-tools.hidden{display:none;}
+  #debug-pin-input{letter-spacing:0.3em; text-align:center;}
+  .debug-pin-error{color:var(--crimson); font-size:11px;}
+  .debug-pin-error.hidden{display:none;}
 
   /* --- Map view (Spire-style branching graph) --- */
   .map-view{
@@ -444,6 +454,8 @@
     .shop-offer{flex-direction:column; align-items:stretch; text-align:center;}
   }
 </style>
+</head>
+<body>
 
 <div class="masthead">
   <h1>Lexicon Hero</h1>
@@ -542,26 +554,36 @@
   </div>
 </div>
 
-<button class="debug-toggle hidden" id="debug-toggle" type="button" title="Testing tools">🛠</button>
+<button class="debug-toggle" id="debug-toggle" type="button" title="Testing tools">🛠</button>
 <div class="debug-panel hidden" id="debug-panel">
   <h3>Testing tools</h3>
-  <div class="debug-row">
-    <label>Reveal current word</label>
-    <button type="button" id="debug-reveal-word">Show word</button>
-    <span id="debug-word-out"></span>
+  <div id="debug-lock">
+    <div class="debug-row">
+      <label>Enter PIN</label>
+      <input type="password" id="debug-pin-input" inputmode="numeric" autocomplete="off" maxlength="6" placeholder="••••••" />
+      <button type="button" id="debug-pin-submit">Unlock</button>
+      <span class="debug-pin-error hidden" id="debug-pin-error">Incorrect PIN</span>
+    </div>
   </div>
-  <div class="debug-row">
-    <label>Give item</label>
-    <select id="debug-item-select"></select>
-    <button type="button" id="debug-give-item">Add to pack</button>
-  </div>
-  <div class="debug-row">
-    <label>Starting power</label>
-    <button type="button" id="debug-give-power" disabled title="Not built yet — waiting on the meta-progression power system">Issue a power</button>
-  </div>
-  <div class="debug-row">
-    <label>Danger zone</label>
-    <button type="button" class="danger" id="debug-kill-self">Kill me instantly</button>
+  <div id="debug-tools" class="hidden">
+    <div class="debug-row">
+      <label>Reveal current word</label>
+      <button type="button" id="debug-reveal-word">Show word</button>
+      <span id="debug-word-out"></span>
+    </div>
+    <div class="debug-row">
+      <label>Give item</label>
+      <select id="debug-item-select"></select>
+      <button type="button" id="debug-give-item">Add to pack</button>
+    </div>
+    <div class="debug-row">
+      <label>Starting power</label>
+      <button type="button" id="debug-give-power">Issue a power</button>
+    </div>
+    <div class="debug-row">
+      <label>Danger zone</label>
+      <button type="button" class="danger" id="debug-kill-self">Kill me instantly</button>
+    </div>
   </div>
 </div>
 
@@ -1736,16 +1758,20 @@
   document.getElementById('power-skip').addEventListener('click', skipPower);
 
   // ---------- debug / God-mode panel (testing only) ----------
-  // Hidden unless the page is loaded with ?debug=1, so friend-playtesters
-  // never stumble into it by accident.
+  // Always present at the base URL (no ?debug=1 needed), gated behind a PIN
+  // instead. NOTE: this is a casual deterrent, not real security — the PIN
+  // check runs in this same client-side JS, visible to anyone who views the
+  // page source. It's meant to keep friend-playtesters from stumbling into
+  // it by accident, not to withstand anyone who goes looking for it.
   (function setupDebugPanel(){
-    var params = new URLSearchParams(location.search);
-    if (params.get('debug') !== '1') return;
+    var DEBUG_PIN = '134679';
+    var UNLOCK_KEY = 'lexiconHero_debugUnlocked';
 
     var toggle = document.getElementById('debug-toggle');
     var panel = document.getElementById('debug-panel');
+    var lockView = document.getElementById('debug-lock');
+    var toolsView = document.getElementById('debug-tools');
     var select = document.getElementById('debug-item-select');
-    toggle.classList.remove('hidden');
 
     SHOP_CATALOG.forEach(function(tpl, i){
       var opt = document.createElement('option');
@@ -1754,7 +1780,42 @@
       select.appendChild(opt);
     });
 
-    toggle.addEventListener('click', function(){ panel.classList.toggle('hidden'); });
+    function isUnlocked(){
+      try { return localStorage.getItem(UNLOCK_KEY) === '1'; } catch (e){ return false; }
+    }
+    function setUnlocked(){
+      try { localStorage.setItem(UNLOCK_KEY, '1'); } catch (e){ /* stays unlocked for this page load only */ }
+    }
+    function refreshLockState(){
+      if (isUnlocked()){
+        lockView.classList.add('hidden');
+        toolsView.classList.remove('hidden');
+      } else {
+        lockView.classList.remove('hidden');
+        toolsView.classList.add('hidden');
+      }
+    }
+
+    function attemptUnlock(){
+      var input = document.getElementById('debug-pin-input');
+      if (input.value.trim() === DEBUG_PIN){
+        setUnlocked();
+        document.getElementById('debug-pin-error').classList.add('hidden');
+        input.value = '';
+        refreshLockState();
+      } else {
+        document.getElementById('debug-pin-error').classList.remove('hidden');
+      }
+    }
+
+    toggle.addEventListener('click', function(){
+      panel.classList.toggle('hidden');
+      if (!panel.classList.contains('hidden')) refreshLockState();
+    });
+    document.getElementById('debug-pin-submit').addEventListener('click', attemptUnlock);
+    document.getElementById('debug-pin-input').addEventListener('keydown', function(ev){
+      if (ev.key === 'Enter') attemptUnlock();
+    });
 
     document.getElementById('debug-reveal-word').addEventListener('click', function(){
       var out = document.getElementById('debug-word-out');
@@ -1798,3 +1859,5 @@
   startRun();
 })();
 </script>
+</body>
+</html>
