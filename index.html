@@ -118,7 +118,20 @@
     font-size:12px;
     color:var(--bone-dim);
   }
-  .item-chip{cursor:help;}
+  .item-chip{cursor:pointer; position:relative;}
+  .item-chip .item-tooltip{
+    position:absolute; bottom:calc(100% + 9px); left:0;
+    width:210px; max-width:60vw;
+    background:#15121f; color:var(--bone); border:1px solid var(--ink-3); border-radius:var(--radius-s);
+    padding:9px 11px; font-family:var(--font-body); font-size:11.5px; line-height:1.45; letter-spacing:normal; text-transform:none;
+    box-shadow:0 8px 22px rgba(0,0,0,0.45);
+    opacity:0; transform:translateY(4px); pointer-events:none; transition:opacity 140ms ease, transform 140ms ease;
+    z-index:60;
+  }
+  .item-chip .item-tooltip::after{
+    content:""; position:absolute; top:100%; left:16px; border:6px solid transparent; border-top-color:#15121f;
+  }
+  .item-chip:hover .item-tooltip, .item-chip.show-tooltip .item-tooltip{opacity:1; transform:translateY(0); pointer-events:auto;}
   .item-chip .item-dot{width:8px; height:8px; border-radius:50%; flex:none;}
   .item-chip[data-kind="potion"] .item-dot{background:var(--tile-green);}
   .item-chip[data-kind="orb"] .item-dot{background:var(--tier-3);}
@@ -386,6 +399,14 @@
   .tile[data-state="green"]{background:var(--tile-green); border-color:var(--tile-green); color:#0d150f;}
   .tile[data-state="yellow"]{background:var(--tile-gold); border-color:var(--tile-gold); color:#241a05;}
   .tile[data-state="gray"]{background:var(--tile-gray); border-color:var(--tile-gray); color:var(--muted);}
+  .tile.tile-ghost{
+    color:var(--tier-2); border-style:dashed; border-color:var(--tier-2); background:var(--ink-1);
+    opacity:0.65; animation:ghost-pulse 1.8s ease-in-out infinite;
+  }
+  @keyframes ghost-pulse{
+    0%,100%{opacity:0.5;}
+    50%{opacity:0.85;}
+  }
   .row-damage{font-family:var(--font-mono); font-size:12px; display:flex; gap:10px; white-space:nowrap;}
   .dmg-dealt{color:var(--gold);}
   .dmg-taken{color:var(--crimson);}
@@ -447,6 +468,62 @@
     background:var(--gold); color:#241a05; border:none; border-radius:var(--radius-s); padding:12px 28px; cursor:pointer; margin-top:8px;
   }
   #restart-btn:hover{filter:brightness(1.08);}
+
+  /* --- Leaf of Truth shimmer reveal --- */
+  .leaf-reveal{
+    position:fixed; left:50%; top:38%; transform:translate(-50%,-50%) scale(0.9);
+    max-width:min(420px,86vw); text-align:center; z-index:70;
+    background:linear-gradient(160deg, rgba(58,42,90,0.96), rgba(20,16,32,0.96));
+    border:1px solid var(--tier-1); border-radius:var(--radius-m);
+    padding:18px 24px; box-shadow:0 0 0 1px rgba(200,168,255,0.15), 0 12px 40px rgba(0,0,0,0.55), 0 0 30px rgba(160,120,220,0.35);
+    color:var(--bone); font-family:var(--font-body); font-size:14.5px; line-height:1.5;
+    opacity:0; pointer-events:none;
+  }
+  .leaf-reveal .leaf-eyebrow{
+    display:block; font-family:var(--font-display); letter-spacing:0.14em; text-transform:uppercase;
+    font-size:11px; color:var(--tier-1); margin-bottom:6px;
+  }
+  .leaf-reveal.hidden{display:none;}
+  .leaf-reveal.leaf-anim{animation:leaf-shimmer 3.2s ease forwards;}
+  @keyframes leaf-shimmer{
+    0%{opacity:0; transform:translate(-50%,-50%) scale(0.85);}
+    12%{opacity:1; transform:translate(-50%,-50%) scale(1.03);}
+    20%{transform:translate(-50%,-50%) scale(1);}
+    85%{opacity:1;}
+    100%{opacity:0; transform:translate(-50%,-50%) scale(0.97);}
+  }
+
+  /* --- Fight result (word-completed) popup --- */
+  .fight-result-overlay{
+    position:fixed; inset:0; z-index:65; display:flex; align-items:center; justify-content:center;
+    background:rgba(8,7,14,0.72); padding:20px;
+  }
+  .fight-result-overlay.hidden{display:none;}
+  .fight-result-card{
+    width:100%; max-width:380px; background:var(--ink-1); border:1px solid var(--tier-color, var(--gold));
+    border-radius:var(--radius-m); padding:28px 26px; text-align:center;
+    box-shadow:0 0 0 1px rgba(255,255,255,0.04), 0 20px 60px rgba(0,0,0,0.6), 0 0 34px var(--tier-color, var(--gold));
+    animation:fr-pop 260ms cubic-bezier(.2,.9,.3,1.3);
+  }
+  @keyframes fr-pop{
+    0%{opacity:0; transform:scale(0.85) translateY(10px);}
+    100%{opacity:1; transform:scale(1) translateY(0);}
+  }
+  .fr-eyebrow{font-family:var(--font-display); letter-spacing:0.14em; text-transform:uppercase; font-size:12px; color:var(--tier-color, var(--gold));}
+  .fr-word{
+    font-family:var(--font-mono); font-weight:700; font-size:clamp(24px,6vw,34px); letter-spacing:0.1em;
+    color:var(--bone); margin:8px 0 2px;
+  }
+  .fr-subtitle{color:var(--bone-dim); font-size:13px; margin:0 0 16px;}
+  .fr-stats{display:grid; grid-template-columns:repeat(2,minmax(120px,1fr)); gap:10px 20px; margin-bottom:20px; text-align:left;}
+  .fr-stat{display:flex; flex-direction:column; gap:2px;}
+  .fr-stat .label{font-size:10px; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted);}
+  .fr-stat .value{font-family:var(--font-mono); font-size:16px; font-weight:700; color:var(--bone);}
+  #fr-continue{
+    font-family:var(--font-body); font-weight:700; font-size:14px; letter-spacing:0.04em; text-transform:uppercase;
+    background:var(--gold); color:#241a05; border:none; border-radius:var(--radius-s); padding:12px 28px; cursor:pointer;
+  }
+  #fr-continue:hover{filter:brightness(1.08);}
 
   @media (max-width:420px){
     .tile{width:30px; height:30px; font-size:14px;}
@@ -544,6 +621,18 @@
     <p class="guess-meta" id="guess-meta">Guess 1 / 6</p>
 
     <div class="log" id="log" aria-live="polite"></div>
+  </div>
+
+  <div class="leaf-reveal hidden" id="leaf-reveal"></div>
+
+  <div class="fight-result-overlay hidden" id="fight-result-overlay">
+    <div class="fight-result-card" id="fight-result-card">
+      <span class="fr-eyebrow" id="fr-eyebrow">Defeated</span>
+      <div class="fr-word" id="fr-word">WORD</div>
+      <p class="fr-subtitle" id="fr-subtitle">Solved outright</p>
+      <div class="fr-stats" id="fr-stats"></div>
+      <button id="fr-continue" type="button">Continue</button>
+    </div>
   </div>
 
   <div class="end-banner hidden" id="end-banner">
@@ -869,7 +958,9 @@
     if (r === ROWS_PER_FLOOR - 1) return 'rest';
     // Periodic guaranteed checkpoint rows, same reasoning: a random per-node
     // chance of a rest node meant many paths never crossed one at all.
-    if (r > 0 && r % REST_CHECKPOINT_EVERY === 0) return 'rest';
+    // Skip the row directly before the guaranteed pre-boss rest row above —
+    // otherwise a floor can force two full-heal rows back to back.
+    if (r > 0 && r !== ROWS_PER_FLOOR - 2 && r % REST_CHECKPOINT_EVERY === 0) return 'rest';
     if (r === 1) return Math.random() < 0.75 ? 'fight' : 'event';
     var roll = Math.random();
     if (roll < 0.45) return 'fight';
@@ -1088,18 +1179,27 @@
       var chip = document.createElement('div');
       chip.className = 'item-chip';
       chip.setAttribute('data-kind', item.kind);
-      chip.title = describeItem(item.kind, item.value);
+      chip.setAttribute('aria-label', describeItem(item.kind, item.value));
+      var tooltipHtml = '<span class="item-tooltip">' + describeItem(item.kind, item.value) + '</span>';
       var isPassive = item.kind === 'revive';
       if (isPassive){
-        chip.innerHTML = '<span class="item-dot"></span><span>' + itemChipLabel(item) + '</span><span class="item-passive-tag">Passive</span>';
+        chip.innerHTML = '<span class="item-dot"></span><span>' + itemChipLabel(item) + '</span><span class="item-passive-tag">Passive</span>' + tooltipHtml;
       } else {
         var canUse = isItemUsableNow(item);
         var btnLabel = item.kind === 'potion' ? 'Drink' : 'Use';
         chip.innerHTML =
           '<span class="item-dot"></span><span>' + itemChipLabel(item) + '</span>' +
-          '<button type="button"' + (canUse ? '' : ' disabled') + '>' + btnLabel + '</button>';
+          '<button type="button"' + (canUse ? '' : ' disabled') + '>' + btnLabel + '</button>' + tooltipHtml;
         chip.querySelector('button').addEventListener('click', function(){ useItem(item.id); });
       }
+      // Hover shows the tooltip on desktop (CSS :hover); this click handler
+      // makes it work on touch devices too, which have no hover state at all.
+      chip.addEventListener('click', function(ev){
+        if (ev.target.closest('button')) return;
+        var wasOpen = chip.classList.contains('show-tooltip');
+        document.querySelectorAll('.item-chip.show-tooltip').forEach(function(c){ c.classList.remove('show-tooltip'); });
+        if (!wasOpen) chip.classList.add('show-tooltip');
+      });
       bar.appendChild(chip);
     });
   }
@@ -1161,6 +1261,7 @@
       log('Used a Telescope — position ' + (pos + 1) + ' is "' + letter.toUpperCase() + '".', 'event-kill');
       renderKnownLetters();
       renderInventory();
+      renderTelescopeGhosts();
     } else if (item.kind === 'boots'){
       if (fight || !isMapVisible() || state.pendingSkip) return;
       state.pendingSkip = true;
@@ -1176,9 +1277,44 @@
     } else if (item.kind === 'leaf'){
       if (!fight) return;
       state.inventory.splice(idx, 1);
-      log('Used a Leaf of Truth — ' + themeHintForWord(fight.node.word), 'event-kill');
+      var hint = themeHintForWord(fight.node.word);
+      log('Used a Leaf of Truth — ' + hint, 'event-kill');
+      showLeafReveal(hint);
       renderInventory();
     }
+  }
+
+  // Telescoped letters "ghost in" on every guess row that hasn't been
+  // submitted yet — a faint, pulsing preview tile at the revealed position.
+  // Rows already filled in keep their real (non-ghost) result untouched,
+  // since fillBoardRow always sets data-state on every tile in that row.
+  function renderTelescopeGhosts(){
+    var telePositions = Object.keys(fight.telescoped);
+    if (!telePositions.length) return;
+    document.querySelectorAll('.board-row').forEach(function(row){
+      if (row.getAttribute('data-filled') === 'true') return;
+      var tiles = row.querySelectorAll('.tile');
+      telePositions.forEach(function(p){
+        var idx = Number(p);
+        var tile = tiles[idx];
+        if (tile && !tile.hasAttribute('data-state')){
+          tile.textContent = fight.telescoped[p].toUpperCase();
+          tile.classList.add('tile-ghost');
+        }
+      });
+    });
+  }
+
+  var leafRevealTimer = null;
+  function showLeafReveal(hint){
+    var el = document.getElementById('leaf-reveal');
+    el.innerHTML = '<span class="leaf-eyebrow">Leaf of Truth</span>' + hint;
+    el.classList.remove('hidden');
+    el.classList.remove('leaf-anim');
+    void el.offsetWidth; // restart the animation if triggered twice in a row
+    el.classList.add('leaf-anim');
+    clearTimeout(leafRevealTimer);
+    leafRevealTimer = setTimeout(function(){ el.classList.add('hidden'); }, 3300);
   }
 
   // ---------- map rendering ----------
@@ -1432,7 +1568,8 @@
       bestState: new Array(node.length).fill('unknown'),
       knownLetters: new Set(),
       telescoped: {},
-      guessesUsed: 0
+      guessesUsed: 0,
+      totalDamage: 0
     };
     renderBoardSkeleton(node.length);
     renderEnemyPlaque();
@@ -1574,6 +1711,7 @@
     if (isSolve) dmg = fight.enemyHP;
 
     fight.enemyHP -= dmg;
+    fight.totalDamage += dmg;
     state.totalDealt += dmg;
 
     fillBoardRow(fight.guessesUsed - 1, colors, guess, dmg, isSolve);
@@ -1618,7 +1756,7 @@
 
     if (enemyDefeated){
       log(isSolve ? 'Solved outright — instant kill!' : 'Worn down to 0 HP — defeated!', 'event-kill');
-      advanceFromNode(node, 'won');
+      showFightResult(node, isSolve, overkillXp);
       return;
     }
 
@@ -1629,6 +1767,41 @@
     }
 
     renderGuessMeta();
+  }
+
+  // Shows a "word completed" popup with the word and this fight's stats
+  // before actually advancing — makes a kill feel like an event instead of
+  // silently dumping the player back on the map. Continue triggers the real
+  // advanceFromNode(), which is where spoils/XP/floor-transition logic lives.
+  function showFightResult(node, isSolve, overkillXp){
+    var tier = TIERS[node.tier];
+    document.getElementById('fight-result-card').style.setProperty('--tier-color', tier.color);
+    document.getElementById('fr-eyebrow').textContent = node.type === 'boss' ? 'Boss defeated' : (node.type === 'elite' ? 'Elite defeated' : 'Word defeated');
+    document.getElementById('fr-word').textContent = node.word.toUpperCase();
+    document.getElementById('fr-subtitle').textContent = isSolve ? 'Solved outright — instant kill' : 'Worn down to 0 HP';
+
+    var statRows = [
+      ['Guesses used', fight.guessesUsed + ' / ' + effectiveMaxGuesses()],
+      ['Damage dealt', (fight.totalDamage || 0) + ' dmg'],
+      ['Spoils earned', '+' + node.spoils],
+      ['XP earned', '+' + (node.spoils + overkillXp) + (overkillXp > 0 ? ' (incl. overkill)' : '')]
+    ];
+    var statsEl = document.getElementById('fr-stats');
+    statsEl.innerHTML = '';
+    statRows.forEach(function(pair){
+      var d = document.createElement('div');
+      d.className = 'fr-stat';
+      d.innerHTML = '<span class="label">' + pair[0] + '</span><span class="value">' + pair[1] + '</span>';
+      statsEl.appendChild(d);
+    });
+
+    document.getElementById('guess-input').blur();
+    var overlay = document.getElementById('fight-result-overlay');
+    overlay.classList.remove('hidden');
+    document.getElementById('fr-continue').onclick = function(){
+      overlay.classList.add('hidden');
+      advanceFromNode(node, 'won');
+    };
   }
 
   function advanceFromNode(node, result){
@@ -1747,9 +1920,17 @@
   document.getElementById('guess-form').addEventListener('submit', function(ev){
     ev.preventDefault();
     if (!state || state.ended || !fight) return;
+    if (!document.getElementById('fight-result-overlay').classList.contains('hidden')) return;
     var input = document.getElementById('guess-input');
     if (!input.value.trim()) return;
     handleGuess(input.value);
+  });
+
+  // Close any open item tooltip (touch-toggled) when tapping elsewhere.
+  document.addEventListener('click', function(ev){
+    if (!ev.target.closest('.item-chip')){
+      document.querySelectorAll('.item-chip.show-tooltip').forEach(function(c){ c.classList.remove('show-tooltip'); });
+    }
   });
 
   document.getElementById('shop-continue').addEventListener('click', leaveShop);
