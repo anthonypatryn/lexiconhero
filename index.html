@@ -68,6 +68,7 @@
   .masthead p{margin:0; color:var(--muted); font-size:13px; letter-spacing:0.03em;}
 
   .shell{width:100%; max-width:640px; display:flex; flex-direction:column; gap:18px;}
+  .shell.wide{max-width:920px;}
 
   .topbar{
     display:flex;
@@ -80,7 +81,7 @@
     padding:14px 18px;
     flex-wrap:wrap;
   }
-  .stat-block{display:flex; flex-direction:column; gap:2px;}
+  .stat-block{display:flex; flex-direction:column; gap:2px; position:relative;}
   .stat-block.align-end{align-items:flex-end;}
   .eyebrow{font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted);}
   .stat-value{
@@ -95,7 +96,31 @@
   .stat-value.xp{color:var(--tier-3);}
   .stat-value.mana{color:var(--tier-2);}
   .stat-block.hidden{display:none;}
-  .hearts{display:flex; gap:4px;}
+  .hearts{display:flex; gap:4px; position:relative;}
+  .hearts.hearts-hit{animation:hearts-hit-anim 340ms ease;}
+  @keyframes hearts-hit-anim{
+    0%,100%{filter:none; transform:scale(1);}
+    30%{filter:brightness(1.5) saturate(1.6); transform:scale(1.08);}
+  }
+
+  /* --- Floating damage / heal / spoils / xp popups --- */
+  .float-popup{
+    position:absolute; left:50%; top:-2px; transform:translate(-50%,0) scale(0.85);
+    font-family:var(--font-mono); font-weight:800; font-size:15px; letter-spacing:0.02em;
+    pointer-events:none; opacity:0; white-space:nowrap; z-index:45;
+    text-shadow:0 2px 8px rgba(0,0,0,0.65);
+  }
+  .float-popup.go{animation:float-popup-anim 950ms ease forwards;}
+  @keyframes float-popup-anim{
+    0%{opacity:0; transform:translate(-50%,0) scale(0.8);}
+    16%{opacity:1; transform:translate(-50%,-8px) scale(1.08);}
+    100%{opacity:0; transform:translate(-50%,-46px) scale(1);}
+  }
+  .float-popup.dmg{color:var(--crimson);}
+  .float-popup.heal{color:var(--tile-green);}
+  .float-popup.gold{color:var(--gold);}
+  .float-popup.xp{color:var(--tier-3);}
+  .float-popup.spend{color:var(--bone-dim);}
   .heart{width:22px; height:22px;}
   .heart-outline{fill:var(--ink-3); stroke:var(--muted); stroke-width:1;}
   .heart-fill{fill:var(--gold);}
@@ -236,6 +261,8 @@
   .encounter-pip[data-status="done"]{border-color:var(--tile-green); color:var(--tile-green); background:rgba(79,122,91,0.12);}
   .encounter-pip.type-boss[data-status="current"]{border-color:var(--tier-5); color:var(--tier-5); box-shadow:0 0 14px rgba(192,68,111,0.45);}
 
+  .card-slot{display:flex; justify-content:center;}
+
   .encounter-card{
     --tier-color: var(--gold);
     position:relative;
@@ -246,8 +273,41 @@
     padding:14px 16px 16px;
     text-align:center;
     max-width:280px;
+    width:100%;
     margin:0 auto;
     box-shadow:0 0 0 1px rgba(0,0,0,0.3), 0 14px 34px rgba(0,0,0,0.45);
+  }
+  .encounter-card.card-revealing{animation:card-reveal-anim 460ms cubic-bezier(.22,.85,.32,1.05);}
+  @keyframes card-reveal-anim{
+    0%{opacity:0; transform:scale(0.82) translateY(18px) rotate(-3deg);}
+    55%{opacity:1;}
+    100%{opacity:1; transform:scale(1) translateY(0) rotate(0);}
+  }
+  .encounter-card.card-hit{animation:card-hit-anim 360ms ease;}
+  @keyframes card-hit-anim{
+    0%,100%{transform:translateX(0); filter:none;}
+    20%{transform:translateX(-6px); filter:brightness(1.6) saturate(1.4);}
+    40%{transform:translateX(5px);}
+    60%{transform:translateX(-3px); filter:brightness(1.2);}
+    80%{transform:translateX(2px);}
+  }
+  .encounter-card.card-attacking{animation:card-attack-anim 420ms cubic-bezier(.3,.6,.3,1);}
+  @keyframes card-attack-anim{
+    0%{transform:translateX(0) rotate(0);}
+    30%{transform:translateX(-18px) rotate(-4deg);}
+    55%{transform:translateX(4px) rotate(2deg);}
+    100%{transform:translateX(0) rotate(0);}
+  }
+  .encounter-card.card-dying{animation:card-dying-anim 420ms ease-in forwards;}
+  @keyframes card-dying-anim{
+    0%{opacity:1; transform:scale(1) rotate(0); filter:none;}
+    40%{opacity:1; transform:scale(1.05) rotate(-2deg); filter:brightness(1.5) saturate(0);}
+    100%{opacity:0; transform:scale(0.7) rotate(6deg) translateY(14px); filter:brightness(0.6) saturate(0);}
+  }
+  .encounter-card.card-fleeing{animation:card-fleeing-anim 380ms ease-in forwards;}
+  @keyframes card-fleeing-anim{
+    0%{opacity:1; transform:translateX(0) scale(1);}
+    100%{opacity:0; transform:translateX(60px) scale(0.85);}
   }
   .card-level-badge{
     position:absolute; top:-10px; left:-10px;
@@ -262,6 +322,7 @@
     z-index:2;
   }
   .card-portrait{
+    position:relative;
     width:100%;
     aspect-ratio:1.15/1;
     max-height:150px;
@@ -273,6 +334,13 @@
     display:flex; align-items:center; justify-content:center;
     margin-bottom:10px;
   }
+  .card-tier-tag{
+    position:absolute; top:6px; right:6px;
+    display:flex; align-items:center; gap:5px;
+    background:rgba(8,7,14,0.55); border-radius:999px; padding:3px 8px 3px 6px;
+  }
+  .card-tier-tag .tier-gem{width:9px; height:9px; border-radius:2px; background:var(--tier-color); transform:rotate(45deg); flex:none; box-shadow:0 0 8px var(--tier-color);}
+  .card-tier-tag .tier-label{font-size:9.5px; letter-spacing:0.1em; text-transform:uppercase; color:var(--tier-color); font-weight:700;}
   .creature-icon{width:64%; height:64%; overflow:visible;}
   .creature-icon .ci-fill{fill:var(--tier-color);}
   .creature-icon .ci-line{fill:none; stroke:var(--ink-0); stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round;}
@@ -294,6 +362,9 @@
   .card-stat.atk svg{fill:var(--steel);}
   .card-stat.gold{color:var(--gold);}
   .card-stat.gold svg{fill:var(--gold);}
+  .card-hp-track{width:100%; height:6px; background:var(--ink-2); border-radius:3px; overflow:hidden; border:1px solid var(--ink-3); margin:-3px 0 10px;}
+  .card-hp-track.hidden{display:none;}
+  .card-hp-fill{height:100%; background:linear-gradient(90deg, var(--crimson), var(--gold)); width:100%; transition:width 260ms ease;}
   .card-flavor{
     width:100%;
     background:var(--ink-0);
@@ -467,39 +538,52 @@
   /* --- Fight arena --- */
   .arena{display:flex; flex-direction:column; gap:18px;}
   .arena.hidden{display:none;}
+  .arena-body{display:flex; gap:22px; align-items:flex-start;}
+  .arena-main{flex:1; min-width:0; display:flex; flex-direction:column; gap:16px;}
 
-  .enemy-plaque{
-    background:var(--ink-1);
-    border:1px solid var(--ink-3);
-    border-radius:var(--radius-m);
-    padding:20px;
-    display:flex;
-    flex-direction:column;
-    gap:10px;
-    position:relative;
-    overflow:hidden;
+  /* Persistent card dock: on wide screens a static sidebar beside the board;
+     on narrow screens a fixed edge drawer (tab peeks out, tap/swipe to
+     reveal) so the card really can "stay visible the whole time" without
+     crowding out the guess board on a phone. */
+  #card-dock-wrap{
+    flex:0 0 240px;
+    display:flex; align-items:flex-start; justify-content:center;
+    position:sticky; top:16px;
   }
-  .enemy-plaque::before{content:""; position:absolute; inset:0; background:var(--tier-color, var(--tier-1)); opacity:0.08; pointer-events:none;}
-  .tier-row{display:flex; align-items:center; gap:10px;}
-  .tier-gem{width:12px; height:12px; border-radius:2px; background:var(--tier-color, var(--tier-1)); transform:rotate(45deg); flex:none; box-shadow:0 0 10px var(--tier-color, var(--tier-1));}
-  .tier-label{font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--tier-color, var(--tier-1)); font-weight:700;}
-  .enemy-name{font-family:var(--font-display); font-size:clamp(20px,4vw,26px); font-weight:700; letter-spacing:0.05em; margin:0; color:var(--bone);}
-  .enemy-stats-row{display:flex; gap:20px; flex-wrap:wrap; font-family:var(--font-mono); font-size:12px; color:var(--bone-dim);}
-  .enemy-stats-row strong{color:var(--bone); font-weight:600;}
-  .hp-bar-track{width:100%; height:10px; background:var(--ink-2); border-radius:5px; overflow:hidden; border:1px solid var(--ink-3);}
-  .hp-bar-fill{height:100%; background:linear-gradient(90deg, var(--crimson), var(--gold)); width:100%; transition:width 240ms ease;}
-  .hp-numbers{font-family:var(--font-mono); font-variant-numeric:tabular-nums; font-size:12px; color:var(--bone-dim); text-align:right;}
+  #card-dock{width:100%;}
+  .card-dock-tab{display:none;}
+
+  @media (max-width:759px){
+    .arena-body{display:block;}
+    #card-dock-wrap{
+      position:fixed; top:50%; right:0; transform:translateY(-50%) translateX(0);
+      z-index:55; flex:none; width:auto; align-items:center;
+      transition:transform 320ms cubic-bezier(.22,.85,.32,1);
+    }
+    #card-dock-wrap.dragging{transition:none;}
+    #card-dock-wrap.drawer-closed{transform:translateY(-50%) translateX(calc(100% - 34px));}
+    #card-dock{width:64vw; max-width:230px; max-height:78vh; overflow-y:auto; padding:4px 0;}
+    .card-dock-tab{
+      display:flex; align-items:center; justify-content:center; flex:none;
+      width:34px; height:110px;
+      background:var(--ink-1); border:1px solid var(--gold); border-right:none;
+      border-radius:10px 0 0 10px; color:var(--gold); font-size:17px; cursor:pointer;
+      writing-mode:vertical-rl;
+    }
+  }
+
   .known-letters{font-family:var(--font-mono); font-size:11.5px; color:var(--tier-3);}
   .known-letters.hidden{display:none;}
 
   .board{display:flex; flex-direction:column; gap:8px;}
   .board-row{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
-  .tiles{display:flex; gap:6px;}
+  .tiles{display:flex; gap:6px; perspective:500px;}
   .tile{
     width:38px; height:38px;
     display:flex; align-items:center; justify-content:center;
     font-family:var(--font-mono); font-weight:700; font-size:17px; text-transform:uppercase;
     border-radius:var(--radius-s); border:1px solid var(--ink-3); background:var(--ink-2); color:var(--bone-dim);
+    transform-style:preserve-3d;
   }
   .tile[data-state="green"]{background:var(--tile-green); border-color:var(--tile-green); color:#0d150f;}
   .tile[data-state="yellow"]{background:var(--tile-gold); border-color:var(--tile-gold); color:#241a05;}
@@ -511,6 +595,17 @@
   @keyframes ghost-pulse{
     0%,100%{opacity:0.5;}
     50%{opacity:0.85;}
+  }
+  .tile.tile-spawn{animation:tile-spawn-anim 260ms ease backwards;}
+  @keyframes tile-spawn-anim{
+    0%{opacity:0; transform:scale(0.6);}
+    100%{opacity:1; transform:scale(1);}
+  }
+  .tile.tile-reveal{animation:tile-reveal-anim 360ms cubic-bezier(.22,.85,.3,1.3) backwards;}
+  @keyframes tile-reveal-anim{
+    0%{transform:scale(0.55) rotateX(-70deg); opacity:0.3;}
+    55%{transform:scale(1.08) rotateX(10deg); opacity:1;}
+    100%{transform:scale(1) rotateX(0); opacity:1;}
   }
   .row-damage{font-family:var(--font-mono); font-size:12px; display:flex; gap:10px; white-space:nowrap;}
   .dmg-dealt{color:var(--gold);}
@@ -543,6 +638,28 @@
   #guess-submit:disabled{background:var(--ink-3); color:var(--muted); cursor:not-allowed;}
 
   .guess-meta{margin:0; font-family:var(--font-mono); font-size:11px; color:var(--muted); text-align:right;}
+
+  /* --- On-screen QWERTY keyboard --- */
+  .keyboard{display:flex; flex-direction:column; gap:6px; margin-top:2px;}
+  .kb-row{display:flex; gap:5px; justify-content:center;}
+  .kb-key{
+    flex:1; max-width:38px; height:42px;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--ink-2); border:1px solid var(--ink-3); border-radius:5px;
+    color:var(--bone); font-family:var(--font-mono); font-weight:700; font-size:12.5px;
+    cursor:pointer; text-transform:uppercase; user-select:none;
+    transition:background 120ms ease, transform 80ms ease, filter 120ms ease;
+  }
+  .kb-key:hover{filter:brightness(1.15);}
+  .kb-key:active{transform:translateY(1px);}
+  .kb-key.kb-wide{max-width:56px; font-size:10px; letter-spacing:0.02em;}
+  .kb-key.kb-green{background:var(--tile-green); border-color:var(--tile-green); color:#0d150f;}
+  .kb-key.kb-yellow{background:var(--tile-gold); border-color:var(--tile-gold); color:#241a05;}
+  .kb-key.kb-gray{background:var(--tile-gray); border-color:var(--tile-gray); color:var(--muted);}
+  @media (max-width:420px){
+    .kb-key{height:38px; font-size:11px; max-width:30px;}
+    .kb-key.kb-wide{max-width:42px; font-size:8.5px;}
+  }
 
   .log{
     background:var(--ink-1); border:1px solid var(--ink-3); border-radius:var(--radius-m);
@@ -644,13 +761,13 @@
   <p>Wordle Roguelite — battle-math test build</p>
 </div>
 
-<div class="shell">
+<div class="shell" id="shell">
   <div class="topbar">
     <div class="stat-block">
       <span class="eyebrow">Trial</span>
       <span class="stat-value" id="progress-value">1 / 3</span>
     </div>
-    <div class="stat-block">
+    <div class="stat-block" id="spoils-stat-block">
       <span class="eyebrow">Spoils</span>
       <span class="stat-value gold" id="spoils-value">0</span>
     </div>
@@ -658,7 +775,7 @@
       <span class="eyebrow">Shield</span>
       <span class="stat-value steel" id="shield-value">0</span>
     </div>
-    <div class="stat-block" title="Banked XP — carries across runs, even after a defeat. Spend it to permanently level up a class.">
+    <div class="stat-block" id="xp-stat-block" title="Banked XP — carries across runs, even after a defeat. Spend it to permanently level up a class.">
       <span class="eyebrow">XP Bank</span>
       <span class="stat-value xp" id="xp-value">0</span>
     </div>
@@ -684,7 +801,7 @@
       <span class="trial-badge" id="trial-badge">Trial 1 / 3</span>
     </div>
     <div class="encounter-track" id="encounter-track"></div>
-    <div class="encounter-card" id="encounter-card"></div>
+    <div class="card-slot" id="card-slot-run"></div>
 
     <div class="word-log">
       <div class="word-log-col defeated">
@@ -708,31 +825,27 @@
   </div>
 
   <div class="arena hidden" id="arena">
-    <div class="enemy-plaque" id="enemy-plaque">
-      <div class="tier-row">
-        <span class="tier-gem" id="tier-gem"></span>
-        <span class="tier-label" id="tier-label">Common</span>
+    <div class="arena-body">
+      <div class="arena-main">
+        <p class="known-letters hidden" id="known-letters"></p>
+        <div class="board" id="board"></div>
+
+        <form class="guess-row" id="guess-form">
+          <input type="text" id="guess-input" maxlength="8" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Type your guess" />
+          <button type="submit" id="guess-submit">Attack</button>
+        </form>
+        <p class="guess-meta" id="guess-meta">Guess 1 / 6</p>
+
+        <div class="keyboard" id="keyboard"></div>
+
+        <div class="log" id="log" aria-live="polite"></div>
       </div>
-      <h2 class="enemy-name" id="enemy-name">3-Letter Word</h2>
-      <div class="hp-bar-track"><div class="hp-bar-fill" id="hp-fill"></div></div>
-      <div class="hp-numbers" id="hp-numbers">6 / 6 HP</div>
-      <div class="enemy-stats-row">
-        <span>Length: <strong id="stat-length">3</strong></span>
-        <span>Attack after 1st guess: <strong id="stat-attack">1</strong> dmg / round</span>
-        <span>Spoils on kill: <strong id="stat-spoils">4</strong></span>
+
+      <div class="card-dock-wrap" id="card-dock-wrap">
+        <div class="card-dock" id="card-dock"></div>
+        <button class="card-dock-tab" id="card-dock-tab" type="button" aria-label="Toggle creature card">🂠</button>
       </div>
-      <p class="known-letters hidden" id="known-letters"></p>
     </div>
-
-    <div class="board" id="board"></div>
-
-    <form class="guess-row" id="guess-form">
-      <input type="text" id="guess-input" maxlength="8" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Type your guess" />
-      <button type="submit" id="guess-submit">Attack</button>
-    </form>
-    <p class="guess-meta" id="guess-meta">Guess 1 / 6</p>
-
-    <div class="log" id="log" aria-live="polite"></div>
   </div>
 
   <div class="leaf-reveal hidden" id="leaf-reveal"></div>
@@ -956,6 +1069,13 @@
   var MAX_HP = MAX_HEARTS * 2;
   var MAX_GUESSES = 6;
 
+  // How long the card's "dies"/"runs away" animations get to actually play
+  // before the screen moves on (to the fight-result popup, or the shop).
+  // DEATH_ANIM_MS gates only the popup's reveal, not the Continue button's
+  // wiring — see showFightResult() — so an early click never gets lost.
+  var DEATH_ANIM_MS = 300;
+  var RUNAWAY_ANIM_MS = 380; // matches .card-fleeing-anim's duration in the CSS
+
   var state = null;
   var fight = null;
   var currentOffers = null;
@@ -1156,6 +1276,7 @@
     document.getElementById('run-view').classList.add('hidden');
     document.getElementById('shop-view').classList.add('hidden');
     document.getElementById('arena').classList.add('hidden');
+    document.getElementById('shell').classList.remove('wide');
     document.getElementById('class-view').classList.remove('hidden');
     renderTopbar();
     renderClassOffers();
@@ -1226,7 +1347,8 @@
   // is the only reset point for all of those now (replacing the old
   // scattered mid-floor rest-checkpoint system).
   function startTrial(trialIndex){
-    var healed = state.encounters !== null && state.playerHP < MAX_HP;
+    var beforeHP = state.playerHP;
+    var healed = state.encounters !== null && beforeHP < MAX_HP;
     state.trial = trialIndex;
     state.encounters = buildTrialEncounters(trialIndex);
     state.encounterStep = 0;
@@ -1235,6 +1357,10 @@
     state.rogueFreeFleeUsedThisTrial = false;
     if (healed) log('New Trial — you catch your breath. HP restored to full.', 'event-shop');
     showRunScreen();
+    // floatPopup after showRunScreen() (not before) — renderTopbar() inside
+    // it rebuilds #hearts from scratch, which would otherwise wipe a popup
+    // appended before that rebuild ran.
+    if (healed) floatPopup(document.getElementById('hearts'), '+' + (MAX_HP - beforeHP), 'heal');
   }
 
   // ---------- shared chrome ----------
@@ -1273,6 +1399,33 @@
       '<path class="heart-outline" d="M12 21s-6.7-4.35-9.5-8.3C.6 9.9 1.4 6.3 4.4 5 6.6 4 9 4.8 12 8c3-3.2 5.4-4 7.6-3 3 1.3 3.8 4.9 1.9 7.7C18.7 16.65 12 21 12 21z"/>' +
       '<path class="heart-fill" clip-path="url(#clip-' + i + ')" d="M12 21s-6.7-4.35-9.5-8.3C.6 9.9 1.4 6.3 4.4 5 6.6 4 9 4.8 12 8c3-3.2 5.4-4 7.6-3 3 1.3 3.8 4.9 1.9 7.7C18.7 16.65 12 21 12 21z"/>' +
       '</svg>';
+  }
+
+  // ---------- transient visual feedback: floating +/- popups, pulse classes ----------
+  // A small "+N"/"-N" span that appears over `anchorEl`, floats up, and fades
+  // out. anchorEl needs position:relative (already set on .stat-block,
+  // .hearts, .card-portrait) so the absolutely-positioned popup lands in the
+  // right spot. Purely additive/cosmetic — never gates game logic, so it's
+  // safe to call from anywhere without affecting timing.
+  function floatPopup(anchorEl, text, cls){
+    if (!anchorEl) return;
+    var el = document.createElement('span');
+    el.className = 'float-popup' + (cls ? ' ' + cls : '');
+    el.textContent = text;
+    anchorEl.appendChild(el);
+    void el.offsetWidth;
+    el.classList.add('go');
+    setTimeout(function(){ if (el.parentNode) el.parentNode.removeChild(el); }, 1000);
+  }
+
+  // Restarts a CSS animation class on `el` for `ms`, then removes it. Used
+  // for brief hit/attack flourishes that shouldn't linger or block reuse.
+  function pulseElClass(el, cls, ms){
+    if (!el) return;
+    el.classList.remove(cls);
+    void el.offsetWidth;
+    el.classList.add(cls);
+    setTimeout(function(){ el.classList.remove(cls); }, ms);
   }
 
   // Human-readable tooltip text, also reused as the shop offer description
@@ -1411,6 +1564,7 @@
     renderKnownLetters();
     renderTopbar();
     renderTelescopeGhosts();
+    floatPopup(document.getElementById('mana-stat-block'), '-1', 'spend');
   }
 
   function mageThemeHint(){
@@ -1420,6 +1574,7 @@
     log('Spent 2 Mana (Insight) — ' + hint, 'event-kill');
     showLeafReveal(hint);
     renderTopbar();
+    floatPopup(document.getElementById('mana-stat-block'), '-2', 'spend');
   }
 
   // Auto-triggers a held Revive charm (or, failing that, a Warrior's Undying
@@ -1437,6 +1592,7 @@
       log('A Revive charm flares to life — pulled back from the brink at ' + reviveItem.value + ' HP!', 'event-kill');
       renderTopbar();
       renderInventory();
+      floatPopup(document.getElementById('hearts'), '+' + reviveItem.value, 'heal');
       return false;
     }
     if (state.warriorRevive && !state.warriorReviveUsed){
@@ -1445,6 +1601,7 @@
       log('Undying — refuses to fall, and rises again at half HP!', 'event-kill');
       renderTopbar();
       renderInventory();
+      floatPopup(document.getElementById('hearts'), '+' + state.playerHP, 'heal');
       return false;
     }
     endRun(false, deathMessage);
@@ -1459,9 +1616,11 @@
       var before = state.playerHP;
       state.playerHP = Math.min(MAX_HP, state.playerHP + item.value);
       state.inventory.splice(idx, 1);
-      log('Drank a potion — healed ' + (state.playerHP - before) + ' HP.', 'event-kill');
+      var healedAmt = state.playerHP - before;
+      log('Drank a potion — healed ' + healedAmt + ' HP.', 'event-kill');
       renderTopbar();
       renderInventory();
+      if (healedAmt > 0) floatPopup(document.getElementById('hearts'), '+' + healedAmt, 'heal');
     } else if (item.kind === 'orb'){
       if (!fight) return;
       var secretLetters = Array.from(new Set(fight.node.word.split('')));
@@ -1562,6 +1721,7 @@
     document.getElementById('class-view').classList.add('hidden');
     document.getElementById('end-banner').classList.add('hidden');
     document.getElementById('run-view').classList.remove('hidden');
+    document.getElementById('shell').classList.remove('wide');
     renderTopbar();
     renderRunScreen();
     renderWordLog();
@@ -1685,7 +1845,19 @@
       track.appendChild(pip);
     });
 
+    moveCardToRun();
     var node = state.encounters[state.encounterStep];
+    renderEncounterCard(node);
+  }
+
+  // The single persistent trading card, shared between the pre-fight run
+  // screen and the live arena (it's reparented, not rebuilt, when a fight
+  // starts — see moveCardToRun()/startEncounterFight() — so it can "stay
+  // visible the whole time" instead of disappearing once Fight is clicked).
+  // Called once per new encounter; live HP updates during a fight go through
+  // updateHPBar() instead, which only touches the numbers/bar fill so it
+  // doesn't stomp whatever hit/reveal animation is currently mid-flight.
+  function renderEncounterCard(node){
     var tier = TIERS[node.tier];
     var subtitleKind = node.kind === 'boss' ? (node.bossLabel || 'Boss') : ENCOUNTER_DISPLAY[node.kind];
     var flavor = node.hint ? node.hint : (node.kind === 'boss' ? 'A named terror — no hints down here.' : 'No obvious tells. Read the letters as they fall.');
@@ -1693,16 +1865,19 @@
     card.style.setProperty('--tier-color', tier.color);
     card.innerHTML =
       '<div class="card-level-badge">' + node.tier + '</div>' +
-      '<div class="card-portrait">' + creatureIconMarkup(node.creature) + '</div>' +
+      '<div class="card-portrait">' + creatureIconMarkup(node.creature) +
+        '<span class="card-tier-tag"><span class="tier-gem"></span><span class="tier-label" id="tier-label">' + tier.name + '</span></span>' +
+      '</div>' +
       '<div class="card-name-banner">' +
         '<span class="card-name">' + node.creature + '</span>' +
         '<span class="card-subtitle">' + subtitleKind + ' · ' + tier.name + ' · ' + node.length + '-Letter</span>' +
       '</div>' +
       '<div class="card-stat-row">' +
-        '<span class="card-stat hp">' + CARD_ICON_HEART + node.hp + '</span>' +
+        '<span class="card-stat hp">' + CARD_ICON_HEART + '<span id="hp-numbers">' + node.hp + ' / ' + node.hp + ' HP</span></span>' +
         '<span class="card-stat atk">' + CARD_ICON_SWORD + node.atk + '/rd</span>' +
         '<span class="card-stat gold">' + CARD_ICON_COIN + '+' + node.spoils + '</span>' +
       '</div>' +
+      '<div class="card-hp-track"><div class="card-hp-fill" id="card-hp-fill"></div></div>' +
       '<div class="card-flavor' + (node.hint ? ' has-hint' : '') + '">' + flavor + '</div>' +
       '<button class="encounter-fight-btn" id="encounter-fight-btn" type="button">Fight</button>' +
       (state.rogueFreeFlee && node.kind !== 'boss'
@@ -1713,6 +1888,48 @@
     document.getElementById('encounter-fight-btn').addEventListener('click', function(){ startEncounterFight(node); });
     var fleeBtn = document.getElementById('encounter-flee-btn');
     if (fleeBtn) fleeBtn.addEventListener('click', useFreeFlee);
+
+    card.classList.remove('card-dying', 'card-fleeing', 'card-hit', 'card-attacking', 'card-revealing');
+    void card.offsetWidth;
+    card.classList.add('card-revealing');
+  }
+
+  // ---------- persistent-card FLIP move + drawer helpers ----------
+
+  // Reparents `el` between two spots without a jarring snap: capture the
+  // bounding rect before the mutation, let the mutation happen (including
+  // any hidden/visible toggling it needs), then animate a transform from the
+  // old rect to the new one. In jsdom (no real layout) every rect is zero,
+  // so the "nothing to animate" guard below quietly no-ops — the underlying
+  // DOM/state change from applyChanges() still always happens.
+  function flipAnimate(el, applyChanges){
+    if (!el){ applyChanges(); return; }
+    var first = el.getBoundingClientRect();
+    applyChanges();
+    var last = el.getBoundingClientRect();
+    var dx = first.left - last.left;
+    var dy = first.top - last.top;
+    var sx = last.width ? first.width / last.width : 1;
+    var sy = last.height ? first.height / last.height : 1;
+    if (!isFinite(dx) || !isFinite(dy) || !isFinite(sx) || !isFinite(sy) || sx <= 0 || sy <= 0) return;
+    if (dx === 0 && dy === 0 && sx === 1 && sy === 1) return;
+    el.style.transformOrigin = 'top left';
+    el.style.transition = 'none';
+    el.style.transform = 'translate(' + dx + 'px,' + dy + 'px) scale(' + sx + ',' + sy + ')';
+    void el.offsetWidth;
+    el.style.transition = 'transform 480ms cubic-bezier(.22,.85,.32,1)';
+    el.style.transform = '';
+    setTimeout(function(){ el.style.transition = ''; el.style.transformOrigin = ''; }, 520);
+  }
+
+  // Moves the persistent card back to its pre-fight home (centered under the
+  // encounter track). No FLIP here — the content is about to be rebuilt for
+  // a brand new encounter anyway, so a fresh card-reveal animation (see
+  // renderEncounterCard) reads better than pretending it slid back.
+  function moveCardToRun(){
+    var card = document.getElementById('encounter-card');
+    var slot = document.getElementById('card-slot-run');
+    if (card && slot && card.parentNode !== slot) slot.appendChild(card);
   }
 
   function useFreeFlee(){
@@ -1724,8 +1941,17 @@
   }
 
   function startEncounterFight(node){
-    document.getElementById('run-view').classList.add('hidden');
-    document.getElementById('arena').classList.remove('hidden');
+    var card = document.getElementById('encounter-card');
+    // FLIP-animate the card's move from its centered pre-fight spot into the
+    // persistent dock beside the board — see flipAnimate() above.
+    flipAnimate(card, function(){
+      document.getElementById('run-view').classList.add('hidden');
+      document.getElementById('arena').classList.remove('hidden');
+      document.getElementById('shell').classList.add('wide');
+      document.getElementById('card-dock').appendChild(card);
+      var wrap = document.getElementById('card-dock-wrap');
+      if (wrap) wrap.classList.remove('drawer-closed'); // default open every fight
+    });
     startFight(node);
   }
 
@@ -1739,6 +1965,8 @@
   function goToShopThen(afterCb){
     shopContinueCallback = afterCb;
     document.getElementById('run-view').classList.add('hidden');
+    document.getElementById('arena').classList.add('hidden');
+    document.getElementById('shell').classList.remove('wide');
     document.getElementById('shop-view').classList.remove('hidden');
     var pool = SHOP_CATALOG.slice();
     shuffle(pool);
@@ -1782,6 +2010,7 @@
     }
     renderTopbar();
     renderShop();
+    floatPopup(document.getElementById('spoils-stat-block'), '-' + offer.cost, 'spend');
   }
 
   function leaveShop(){
@@ -1801,15 +2030,17 @@
       bestState: new Array(node.length).fill('unknown'),
       knownLetters: new Set(),
       telescoped: {},
+      letterState: {},
       guessesUsed: 0,
       totalDamage: 0,
       overkillXpTotal: 0
     };
     renderBoardSkeleton(node.length);
-    renderEnemyPlaque();
+    updateHPBar(); // the card's HP pill/bar already show full HP from renderEncounterCard; this just keeps it in sync
     renderKnownLetters();
     renderGuessMeta();
     renderInventory();
+    renderKeyboardSkeleton();
     var intro = node.type === 'boss' ? ('The ' + (node.bossLabel || 'boss') + ' appears: ') : (node.type === 'elite' ? 'An elite blocks the way: ' : 'A challenger appears: ');
     log(intro + 'a ' + node.length + '-letter ' + TIERS[node.tier].name.toLowerCase() + ' word.', 'event-kill');
     document.getElementById('guess-input').setAttribute('maxlength', node.length);
@@ -1817,20 +2048,89 @@
     document.getElementById('guess-input').focus();
   }
 
-  function renderEnemyPlaque(){
-    var node = fight.node;
-    var tier = TIERS[node.tier];
-    var plaque = document.getElementById('enemy-plaque');
-    plaque.style.setProperty('--tier-color', tier.color);
-    document.getElementById('tier-gem').style.background = tier.color;
-    document.getElementById('tier-gem').style.boxShadow = '0 0 10px ' + tier.color;
-    document.getElementById('tier-label').textContent = tier.name + (node.type === 'boss' ? (' — ' + (node.bossLabel || 'Boss')) : (node.type === 'elite' ? ' — Elite' : ''));
-    document.getElementById('tier-label').style.color = tier.color;
-    document.getElementById('enemy-name').textContent = node.length + '-Letter Word';
-    document.getElementById('stat-length').textContent = node.length;
-    document.getElementById('stat-attack').textContent = node.atk;
-    document.getElementById('stat-spoils').textContent = node.spoils;
-    updateHPBar();
+  // ---------- on-screen QWERTY keyboard ----------
+  // A visual reference (like real Wordle's keyboard) plus a click-to-type
+  // input path, useful on touch devices. Rebuilt fresh each fight; letter
+  // states are tracked independently of fight.bestState (which is keyed by
+  // tile position, not letter) and only ever upgrade — gray -> yellow ->
+  // green — matching how the real Wordle keyboard behaves across guesses.
+  var KEYBOARD_ROWS = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
+  var LETTER_RANK = { gray: 1, yellow: 2, green: 3 };
+
+  function renderKeyboardSkeleton(){
+    var kb = document.getElementById('keyboard');
+    if (!kb) return;
+    kb.innerHTML = '';
+    KEYBOARD_ROWS.forEach(function(rowStr, ri){
+      var row = document.createElement('div');
+      row.className = 'kb-row';
+      if (ri === 2){
+        var enterBtn = document.createElement('button');
+        enterBtn.type = 'button';
+        enterBtn.className = 'kb-key kb-wide';
+        enterBtn.textContent = 'ENTER';
+        enterBtn.addEventListener('click', submitFromKeyboard);
+        row.appendChild(enterBtn);
+      }
+      rowStr.split('').forEach(function(letter){
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'kb-key';
+        btn.setAttribute('data-key', letter);
+        btn.textContent = letter.toUpperCase();
+        btn.addEventListener('click', function(){ typeLetter(letter); });
+        row.appendChild(btn);
+      });
+      if (ri === 2){
+        var backBtn = document.createElement('button');
+        backBtn.type = 'button';
+        backBtn.className = 'kb-key kb-wide';
+        backBtn.textContent = '⌫';
+        backBtn.addEventListener('click', backspaceFromKeyboard);
+        row.appendChild(backBtn);
+      }
+      kb.appendChild(row);
+    });
+  }
+
+  function typeLetter(letter){
+    var input = document.getElementById('guess-input');
+    if (!input || !fight) return;
+    if (input.value.length >= fight.node.length) return;
+    input.value += letter;
+    input.focus();
+  }
+
+  function backspaceFromKeyboard(){
+    var input = document.getElementById('guess-input');
+    if (!input) return;
+    input.value = input.value.slice(0, -1);
+    input.focus();
+  }
+
+  function submitFromKeyboard(){
+    var input = document.getElementById('guess-input');
+    if (!input || !input.value.trim() || !fight) return;
+    handleGuess(input.value);
+  }
+
+  // Called once per guess with that guess's letters/colors; upgrades (never
+  // downgrades) each letter's best-known state and repaints the keyboard.
+  function updateKeyboardState(guess, colors){
+    for (var i = 0; i < guess.length; i++){
+      var letter = guess[i];
+      var st = colors[i];
+      var prev = fight.letterState[letter];
+      if (!prev || LETTER_RANK[st] > LETTER_RANK[prev]) fight.letterState[letter] = st;
+    }
+    document.querySelectorAll('.kb-key[data-key]').forEach(function(btn){
+      var letter = btn.getAttribute('data-key');
+      var st = fight.letterState[letter];
+      btn.classList.remove('kb-green', 'kb-yellow', 'kb-gray');
+      if (st === 'green') btn.classList.add('kb-green');
+      else if (st === 'yellow') btn.classList.add('kb-yellow');
+      else if (st === 'gray') btn.classList.add('kb-gray');
+    });
   }
 
   function renderKnownLetters(){
@@ -1853,10 +2153,15 @@
     el.textContent = bits.join(' · ');
   }
 
+  // Updates only the live numbers/bar-fill on the persistent card — never
+  // touches the rest of the card's markup, so it can't interrupt whatever
+  // hit/reveal animation class is currently playing on it.
   function updateHPBar(){
     var pct = Math.max(0, fight.enemyHP / fight.node.hp * 100);
-    document.getElementById('hp-fill').style.width = pct + '%';
-    document.getElementById('hp-numbers').textContent = Math.max(0, fight.enemyHP) + ' / ' + fight.node.hp + ' HP';
+    var fill = document.getElementById('card-hp-fill');
+    if (fill) fill.style.width = pct + '%';
+    var numbers = document.getElementById('hp-numbers');
+    if (numbers) numbers.textContent = Math.max(0, fight.enemyHP) + ' / ' + fight.node.hp + ' HP';
   }
 
   function renderGuessMeta(){
@@ -1928,6 +2233,7 @@
 
     fight.guessesUsed++;
     var colors = scoreGuess(guess, node.word);
+    updateKeyboardState(guess, colors);
     var dmg = 0;
     var greenDmg = state.duelWield ? 3 : 2;
     for (var i = 0; i < node.length; i++){
@@ -1968,6 +2274,11 @@
 
     fillBoardRow(fight.guessesUsed - 1, colors, guess, appliedDmg, isSolve);
 
+    if (appliedDmg > 0){
+      pulseElClass(document.getElementById('encounter-card'), 'card-hit', 380);
+      floatPopup(document.querySelector('#encounter-card .card-portrait'), '-' + appliedDmg, 'dmg');
+    }
+
     var beaten = fight.enemyHP <= 0;
     var justBeaten = beaten && hpBefore > 0;
 
@@ -1986,6 +2297,12 @@
 
     updateHPBar();
     renderTopbar();
+
+    if (retaliation > 0){
+      pulseElClass(document.getElementById('encounter-card'), 'card-attacking', 440);
+      pulseElClass(document.getElementById('hearts'), 'hearts-hit', 360);
+      if (through > 0) floatPopup(document.getElementById('hearts'), '-' + through, 'dmg');
+    }
 
     var logMsg = 'Guess ' + fight.guessesUsed + ': ' + guess.toUpperCase() + ' → ' + appliedDmg + ' dmg dealt';
     if (retaliation > 0){
@@ -2008,11 +2325,17 @@
       earnXp(overkillXp);
       fight.overkillXpTotal += overkillXp;
       log('Overkill! ' + overkillXp + ' excess damage converted to ' + overkillXp + ' bonus XP.', 'event-kill');
+      floatPopup(document.getElementById('xp-stat-block'), '+' + overkillXp, 'xp');
     }
 
     if (isSolve){
       log(hpBefore > 0 ? 'Solved outright — instant kill!' : 'Named at last — the beaten word falls!', 'event-kill');
       showFightResult(node, hpBefore <= 0, fight.overkillXpTotal);
+      // Null `fight` now (after showFightResult already read what it needed
+      // from it) so a guess submitted during the death-animation delay —
+      // before the popup is actually visible — can't re-solve an already-
+      // resolved fight a second time (the submit handler bails on !fight).
+      fight = null;
       return;
     }
 
@@ -2028,7 +2351,16 @@
       // that window can't re-trigger advanceEncounter a second time.
       document.getElementById('guess-input').blur();
       fight = null;
-      advanceEncounter('escaped');
+      var fleeingCard = document.getElementById('encounter-card');
+      if (fleeingCard){
+        fleeingCard.classList.remove('card-hit', 'card-attacking');
+        void fleeingCard.offsetWidth;
+        fleeingCard.classList.add('card-fleeing');
+      }
+      // Let the "runs away" animation actually play before the screen moves
+      // on to the shop — RUNAWAY_ANIM_MS matches the card-fleeing-anim
+      // duration in the CSS.
+      setTimeout(function(){ advanceEncounter('escaped'); }, RUNAWAY_ANIM_MS);
       return;
     }
 
@@ -2066,12 +2398,26 @@
 
     document.getElementById('guess-input').blur();
     var overlay = document.getElementById('fight-result-overlay');
-    overlay.classList.remove('hidden');
+    // Wire Continue immediately (synchronously) so an early click always
+    // works correctly even before the overlay itself becomes visible below —
+    // it just also cancels that pending reveal.
+    clearTimeout(fightResultRevealTimer);
     document.getElementById('fr-continue').onclick = function(){
+      clearTimeout(fightResultRevealTimer);
       overlay.classList.add('hidden');
       advanceEncounter('won');
     };
+    var dyingCard = document.getElementById('encounter-card');
+    if (dyingCard){
+      dyingCard.classList.remove('card-hit', 'card-attacking');
+      void dyingCard.offsetWidth;
+      dyingCard.classList.add('card-dying');
+    }
+    // Give the death animation a beat to actually be seen before the popup
+    // covers the card.
+    fightResultRevealTimer = setTimeout(function(){ overlay.classList.remove('hidden'); }, DEATH_ANIM_MS);
   }
+  var fightResultRevealTimer = null;
 
   // Resolves the current encounter (state.encounters[state.encounterStep])
   // and figures out what comes next. A Shop always follows — whether the
@@ -2081,10 +2427,13 @@
   function advanceEncounter(result){
     var node = state.encounters[state.encounterStep];
     if (result === 'won'){
-      state.spoils += node.spoils + (state.rogueBonusSpoils || 0); // Rogue's Light Fingers (Lv3)
+      var spoilsGain = node.spoils + (state.rogueBonusSpoils || 0); // Rogue's Light Fingers (Lv3)
+      state.spoils += spoilsGain;
       state.fightsCleared++;
       earnXp(node.spoils); // same length+tier formula as Spoils, banked across runs
       state.defeatedWords.push({ word: node.word, length: node.length, tier: node.tier, type: node.type });
+      floatPopup(document.getElementById('spoils-stat-block'), '+' + spoilsGain, 'gold');
+      floatPopup(document.getElementById('xp-stat-block'), '+' + node.spoils, 'xp');
     } else if (result === 'escaped'){
       state.escapedWords.push({ word: node.word, length: node.length, tier: node.tier, type: node.type });
     }
@@ -2126,7 +2475,8 @@
       tiles.className = 'tiles';
       for (var i = 0; i < length; i++){
         var tile = document.createElement('div');
-        tile.className = 'tile';
+        tile.className = 'tile tile-spawn';
+        tile.style.animationDelay = (r * 22 + i * 16) + 'ms';
         tiles.appendChild(tile);
       }
       row.appendChild(tiles);
@@ -2150,8 +2500,13 @@
     row.setAttribute('data-filled', 'true');
     var tiles = row.querySelectorAll('.tile');
     for (var i = 0; i < guess.length; i++){
-      tiles[i].setAttribute('data-state', colors[i]);
-      tiles[i].textContent = guess[i];
+      var tile = tiles[i];
+      tile.classList.remove('tile-ghost', 'tile-spawn', 'tile-reveal');
+      tile.setAttribute('data-state', colors[i]);
+      tile.textContent = guess[i];
+      void tile.offsetWidth;
+      tile.style.animationDelay = (i * 70) + 'ms';
+      tile.classList.add('tile-reveal');
     }
     var dealtSpan = row.querySelector('.dmg-dealt, .dmg-zero');
     dealtSpan.className = dmg > 0 ? 'dmg-dealt' : 'dmg-zero';
@@ -2165,6 +2520,7 @@
     document.getElementById('arena').classList.add('hidden');
     document.getElementById('run-view').classList.add('hidden');
     document.getElementById('shop-view').classList.add('hidden');
+    document.getElementById('shell').classList.remove('wide');
     var banner = document.getElementById('end-banner');
     banner.classList.remove('hidden', 'victory', 'defeat');
     banner.classList.add(victory ? 'victory' : 'defeat');
@@ -2330,6 +2686,72 @@
       startRun();
     });
   })();
+
+  // ---------- persistent card: create once, mobile drawer wiring ----------
+  // The trading card is created a single time here and lives for the whole
+  // page session, reparented between card-slot-run (pre-fight) and
+  // card-dock (mid-fight) — see renderEncounterCard()/moveCardToRun()/
+  // startEncounterFight() above.
+  (function createPersistentCard(){
+    var el = document.createElement('div');
+    el.className = 'encounter-card';
+    el.id = 'encounter-card';
+    var slot = document.getElementById('card-slot-run');
+    if (slot) slot.appendChild(el);
+  })();
+
+  // On narrow screens the card becomes an edge drawer (see the CSS) so it
+  // can stay visible during a fight without crowding out the board. Default
+  // state is open (the whole point is that the card stays visible); a tap
+  // or a horizontal swipe on the tab/panel tucks it away, tap/swipe again
+  // brings it back. touch-only — desktop never shows the tab (CSS hides it).
+  (function setupCardDrawer(){
+    var wrap = document.getElementById('card-dock-wrap');
+    var tab = document.getElementById('card-dock-tab');
+    if (!wrap || !tab) return;
+    var isOpen = true;
+    function setOpen(open){
+      isOpen = open;
+      wrap.classList.toggle('drawer-closed', !open);
+    }
+    tab.addEventListener('click', function(){ setOpen(!isOpen); });
+
+    var dragging = false, startX = 0, wrapWidth = 0, lastDX = 0;
+    function onStart(x){
+      dragging = true;
+      startX = x;
+      wrapWidth = wrap.offsetWidth || 1;
+      lastDX = isOpen ? 0 : (wrapWidth - 34);
+      wrap.classList.add('dragging');
+    }
+    function onMove(x){
+      if (!dragging) return;
+      var next = lastDX + (x - startX);
+      next = Math.max(0, Math.min(wrapWidth - 34, next));
+      wrap.style.transform = 'translateY(-50%) translateX(' + next + 'px)';
+      lastDX = next;
+    }
+    function onEnd(){
+      if (!dragging) return;
+      dragging = false;
+      wrap.classList.remove('dragging');
+      wrap.style.transform = '';
+      setOpen(lastDX < wrapWidth * 0.5);
+    }
+    wrap.addEventListener('touchstart', function(ev){ onStart(ev.touches[0].clientX); }, { passive: true });
+    wrap.addEventListener('touchmove', function(ev){ onMove(ev.touches[0].clientX); }, { passive: true });
+    wrap.addEventListener('touchend', onEnd);
+    wrap.addEventListener('touchcancel', onEnd);
+  })();
+
+  // "Just start typing" — focus the guess input as soon as it's usable.
+  // Also attempted on page load directly; if the arena isn't showing yet
+  // (normal — the Class-select screen comes first) this is a harmless no-op,
+  // since a hidden input can't actually receive focus.
+  window.addEventListener('load', function(){
+    var input = document.getElementById('guess-input');
+    if (input) input.focus();
+  });
 
   startRun();
 })();
