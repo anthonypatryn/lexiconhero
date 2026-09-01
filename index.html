@@ -687,11 +687,13 @@
     </div>
     <div class="debug-row">
       <label>Starting power</label>
-      <button type="button" id="debug-give-power">Issue a power</button>
+      <select id="debug-power-select"></select>
+      <button type="button" id="debug-give-power">Issue power</button>
     </div>
     <div class="debug-row">
       <label>Danger zone</label>
       <button type="button" class="danger" id="debug-kill-self">Kill me instantly</button>
+      <button type="button" class="danger" id="debug-reset-run">Reset to basics</button>
     </div>
   </div>
 </div>
@@ -1819,12 +1821,20 @@
     var lockView = document.getElementById('debug-lock');
     var toolsView = document.getElementById('debug-tools');
     var select = document.getElementById('debug-item-select');
+    var powerSelect = document.getElementById('debug-power-select');
 
     SHOP_CATALOG.forEach(function(tpl, i){
       var opt = document.createElement('option');
       opt.value = String(i);
       opt.textContent = tpl.name;
       select.appendChild(opt);
+    });
+
+    POWERS.forEach(function(power, i){
+      var opt = document.createElement('option');
+      opt.value = String(i);
+      opt.textContent = power.name;
+      powerSelect.appendChild(opt);
     });
 
     function isUnlocked(){
@@ -1893,13 +1903,18 @@
 
     var powerBtn = document.getElementById('debug-give-power');
     powerBtn.disabled = false;
-    powerBtn.title = 'Instantly applies a random Power to the current run, free of charge (bypasses the XP cost).';
+    powerBtn.title = 'Instantly applies the chosen Power to the current run, free of charge (bypasses the XP cost).';
     powerBtn.addEventListener('click', function(){
       if (!state || state.ended) return;
-      var power = pickRandom(POWERS);
+      var power = POWERS[Number(powerSelect.value)];
+      if (!power) return;
       power.apply(state);
       log('[Debug] Instantly granted Power: ' + power.name + ' — ' + power.desc, 'event-shop');
       renderTopbar();
+    });
+
+    document.getElementById('debug-reset-run').addEventListener('click', function(){
+      startRun();
     });
   })();
 
