@@ -194,76 +194,59 @@
   .debug-pin-error{color:var(--crimson); font-size:11px;}
   .debug-pin-error.hidden{display:none;}
 
-  /* --- Map view (Spire-style branching graph) --- */
-  .map-view{
+  /* --- Run view (Balatro-shaped, dungeon-flavored: fixed Warden/Champion/Boss per Trial) --- */
+  .run-view{
     background:var(--ink-1);
     border:1px solid var(--ink-3);
     border-radius:var(--radius-m);
     padding:20px;
     display:flex;
     flex-direction:column;
-    gap:12px;
+    gap:16px;
   }
-  .map-view.hidden{display:none;}
-  .map-header{display:flex; align-items:baseline; justify-content:space-between; gap:10px; flex-wrap:wrap;}
-  .map-header h2{font-family:var(--font-display); font-size:20px; margin:0; letter-spacing:0.04em;}
-  .map-header .floor-badge{font-family:var(--font-mono); font-size:11px; color:var(--gold); letter-spacing:0.08em; text-transform:uppercase;}
-  .map-legend{margin:0; font-size:12px; color:var(--muted); line-height:1.5;}
+  .run-view.hidden{display:none;}
+  .trial-header{display:flex; align-items:baseline; justify-content:space-between; gap:10px; flex-wrap:wrap;}
+  .trial-header h2{font-family:var(--font-display); font-size:20px; margin:0; letter-spacing:0.04em;}
+  .trial-badge{font-family:var(--font-mono); font-size:11px; color:var(--gold); letter-spacing:0.08em; text-transform:uppercase;}
 
-  .map-scroll{
-    max-height:62vh;
-    overflow:auto;
-    border:1px solid var(--ink-3);
-    border-radius:var(--radius-m);
-    background:
-      radial-gradient(ellipse 500px 260px at 50% 0%, rgba(227,165,61,0.05), transparent 70%),
-      var(--ink-0);
-  }
-  .map-canvas{position:relative;}
-  .map-edges{position:absolute; top:0; left:0; z-index:0; pointer-events:none;}
-  .map-node-wrap{position:absolute; z-index:1; display:flex; flex-direction:column; align-items:center;}
-
-  .map-dot{
-    width:40px; height:40px;
-    border-radius:50%;
-    display:flex; align-items:center; justify-content:center;
+  .encounter-track{display:flex; align-items:stretch; justify-content:center; gap:10px;}
+  .encounter-pip{
+    flex:1; max-width:150px;
+    text-align:center;
+    padding:8px 6px;
+    border-radius:var(--radius-s);
+    border:2px solid var(--ink-3);
     background:var(--ink-2);
-    border:2px solid var(--node-color, var(--ink-3));
-    color:var(--bone);
-    font-family:var(--font-mono);
-    font-weight:700;
-    font-size:14px;
-    cursor:default;
-    box-shadow:0 0 0 rgba(0,0,0,0);
+    font-family:var(--font-mono); font-weight:700; font-size:11px; letter-spacing:0.06em;
+    color:var(--muted);
   }
-  .map-dot.type-shop{color:var(--shop); border-style:dashed;}
-  .map-dot.type-rest{color:var(--tile-green);}
-  .map-dot.type-event{color:var(--tier-3);}
-  .map-dot.type-elite{box-shadow:0 0 10px var(--node-color, var(--tier-4));}
-  .map-dot.type-boss{width:48px; height:48px; font-size:11px; box-shadow:0 0 16px var(--tier-5); border-width:3px;}
-  .map-node-wrap[data-status="current"] .map-dot{cursor:pointer; border-color:var(--gold); box-shadow:0 0 12px rgba(227,165,61,0.55);}
-  .map-node-wrap[data-status="current"] .map-dot:hover{filter:brightness(1.2); transform:scale(1.08);}
-  .map-node-wrap[data-status="current"] .map-dot:focus-visible{outline:2px solid var(--gold); outline-offset:2px;}
-  .map-node-wrap[data-status="unreached"] .map-dot{opacity:0.55;}
-  .map-node-wrap[data-status="won"] .map-dot{opacity:0.8; background:var(--tile-green); border-color:var(--tile-green); color:#0d150f;}
-  .map-node-wrap[data-status="escaped"] .map-dot{opacity:0.75; background:var(--crimson-dim); border-color:var(--crimson-dim);}
-  .map-node-wrap[data-status="visited"] .map-dot{opacity:0.75; background:var(--shop); border-color:var(--shop); color:#241a05;}
-  .node-tip{
-    position:absolute; top:44px; left:50%; transform:translateX(-50%);
-    font-family:var(--font-mono); font-size:9px; color:var(--muted);
-    white-space:nowrap; pointer-events:none;
-  }
+  .encounter-pip[data-status="current"]{border-color:var(--gold); color:var(--gold); box-shadow:0 0 12px rgba(227,165,61,0.4);}
+  .encounter-pip[data-status="done"]{border-color:var(--tile-green); color:var(--tile-green); background:rgba(79,122,91,0.12);}
+  .encounter-pip.type-boss[data-status="current"]{border-color:var(--tier-5); color:var(--tier-5); box-shadow:0 0 14px rgba(192,68,111,0.45);}
 
-  .map-current-info{
-    display:flex; flex-direction:column; gap:8px;
+  .encounter-card{
+    --tier-color: var(--gold);
+    display:flex; flex-direction:column; align-items:center; gap:10px;
+    background:var(--ink-0);
+    border:1px solid var(--tier-color);
+    border-radius:var(--radius-m);
+    padding:24px 18px;
+    text-align:center;
   }
-  .current-option{
-    display:flex; align-items:center; justify-content:space-between; gap:10px;
-    background:var(--ink-2); border:1px solid var(--ink-3); border-radius:var(--radius-s);
-    padding:9px 12px;
-    font-family:var(--font-mono); font-size:12px; color:var(--bone-dim);
+  .encounter-eyebrow{font-family:var(--font-display); font-size:16px; letter-spacing:0.05em; color:var(--tier-color);}
+  .encounter-stats{display:flex; flex-wrap:wrap; justify-content:center; gap:14px; font-family:var(--font-mono); font-size:12px; color:var(--bone-dim);}
+  .encounter-stat.gold{color:var(--gold);}
+  .encounter-fight-btn{
+    margin-top:4px;
+    padding:10px 28px;
+    border-radius:var(--radius-s);
+    border:1px solid var(--tier-color);
+    background:var(--tier-color);
+    color:#0d0a06;
+    font-family:var(--font-display); font-weight:700; font-size:14px; letter-spacing:0.05em;
+    cursor:pointer;
   }
-  .current-option strong{color:var(--bone);}
+  .encounter-fight-btn:hover{filter:brightness(1.12);}
 
   .word-log{
     display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:4px;
@@ -573,8 +556,8 @@
 <div class="shell">
   <div class="topbar">
     <div class="stat-block">
-      <span class="eyebrow">Floor</span>
-      <span class="stat-value" id="progress-value">1 / 9</span>
+      <span class="eyebrow">Trial</span>
+      <span class="stat-value" id="progress-value">1 / 3</span>
     </div>
     <div class="stat-block">
       <span class="eyebrow">Spoils</span>
@@ -603,18 +586,13 @@
     </div>
   </div>
 
-  <div class="map-view" id="map-view">
-    <div class="map-header">
-      <h2>The Path</h2>
-      <span class="floor-badge" id="floor-badge">Floor 1 / 3</span>
+  <div class="run-view" id="run-view">
+    <div class="trial-header">
+      <h2>The Trial</h2>
+      <span class="trial-badge" id="trial-badge">Trial 1 / 3</span>
     </div>
-    <p class="map-legend">Number = word length, ring color = tier, dashed = shop, green = rest, purple "?" = event, glowing = elite, large = boss. Scroll to see what's ahead.</p>
-    <div class="map-scroll" id="map-scroll">
-      <div class="map-canvas" id="map-canvas">
-        <svg class="map-edges" id="map-edges"></svg>
-      </div>
-    </div>
-    <div class="map-current-info" id="map-current-info"></div>
+    <div class="encounter-track" id="encounter-track"></div>
+    <div class="encounter-card" id="encounter-card"></div>
 
     <div class="word-log">
       <div class="word-log-col defeated">
@@ -764,19 +742,11 @@
     { kind: 'orb',       value: 1, cost: 3,  name: 'Orb of Knowledge 1', desc: 'Reveals 1 letter in the word — not its position. Fight only.' },
     { kind: 'orb',       value: 2, cost: 5,  name: 'Orb of Knowledge 2', desc: 'Reveals 2 letters in the word — not their position. Fight only.' },
     { kind: 'telescope', value: 1, cost: 4,  name: 'Telescope',          desc: 'Reveals one letter in its exact position, free of charge. Fight only.' },
-    { kind: 'boots',     value: 1, cost: 5,  name: 'Sneaky Boots',       desc: 'Skip your next Fight or Elite pick on the map entirely — no fight, no spoils, no risk.' },
-    { kind: 'wings',     value: 2, cost: 4,  name: 'Wings 2',            desc: 'Jump to any node up to 2 rows ahead on the map, bypassing normal connections.' },
-    { kind: 'wings',     value: 4, cost: 7,  name: 'Wings 4',            desc: 'Jump to any node up to 4 rows ahead on the map, bypassing normal connections.' },
+    { kind: 'boots',     value: 1, cost: 5,  name: 'Sneaky Boots',       desc: 'Skip your current Warden or Champion fight entirely — no fight, no spoils, no risk. Cannot skip the Boss.' },
+    { kind: 'wings',     value: 1, cost: 5,  name: 'Wings',              desc: 'From the Warden, soar straight past the Champion to the Shop before the Boss. Cannot skip the Boss.' },
     { kind: 'revive',    value: 2, cost: 10, name: 'Revive 2',           desc: 'If you would fall to 0 HP, come back instead at 2 HP. Consumed once.' },
     { kind: 'revive',    value: 4, cost: 14, name: 'Revive 4',           desc: 'If you would fall to 0 HP, come back instead at 4 HP. Consumed once.' },
     { kind: 'leaf',      value: 1, cost: 4,  name: 'Leaf of Truth',      desc: 'Reveals what kind of thing the word relates to (e.g. "an animal") — a theme hint, not a letter. Fight only.' }
-  ];
-
-  var EVENT_OUTCOMES = [
-    { text: 'A stray coin purse — found {n} spoils.', apply: function(s){ var n = 2 + Math.floor(Math.random()*3); s.spoils += n; return n; } },
-    { text: 'A hidden cache — found a Healing Potion 2.', apply: function(s){ s.inventory.push({ id: s.nextItemId++, kind:'potion', value:2 }); return null; } },
-    { text: 'A hidden cache — found an Orb of Knowledge 1.', apply: function(s){ s.inventory.push({ id: s.nextItemId++, kind:'orb', value:1 }); return null; } },
-    { text: 'A snapping trap — took 1 damage.', apply: function(s){ s.playerHP = Math.max(0, s.playerHP - 1); return null; } }
   ];
 
   // ---------- meta-progression (XP bank, carries across runs) ----------
@@ -815,12 +785,15 @@
       apply: function(s){ s.duelWield = true; } }
   ];
 
-  var FLOOR_COUNT = 3;
-  var ROWS_PER_FLOOR = 8;    // normal branching rows; a boss row is appended after these
-  var TOTAL_COLUMNS = 7;
+  // ---------- Balatro-shaped run structure, dungeon-flavored: fixed 3 Trials x 3 encounters ----------
+  // Each Trial is Warden -> Champion -> Boss, in that order, always fought
+  // (never branched) — a Shop follows every single encounter resolution (won,
+  // escaped, or skipped via Boots/Wings). HP resets to full at the start of
+  // every Trial. The 3 curated boss words map 1:1 onto the 3 Trials.
+  var TRIAL_COUNT = 3;
+  var ENCOUNTER_KINDS = ['small', 'big', 'boss']; // internal slugs only — user-facing names are Warden/Champion/Boss
   var BOSS_WORDS = ['gambit', 'phoenix', 'quixotic'];
   var BOSS_LABELS = ['Mini-Boss', 'Mini-Boss', 'Final Boss'];
-  var REST_CHECKPOINT_EVERY = 2; // every 2nd row is a guaranteed full-heal row, regardless of path taken
 
   // Enemy attack-per-round, keyed by obscurity tier. Deliberately flatter than
   // the 1-5 tier scale itself: since harder words already take more guesses
@@ -835,7 +808,6 @@
 
   var state = null;
   var fight = null;
-  var currentShopOpt = null;
   var currentOffers = null;
 
   function shuffle(arr){
@@ -847,13 +819,6 @@
   }
   function randInt(min, max){ return min + Math.floor(Math.random() * (max - min + 1)); }
   function pickRandom(arr){ return arr[randInt(0, arr.length - 1)]; }
-
-  function pickDistinctColumns(count, totalCols){
-    var cols = [];
-    for (var i = 0; i < totalCols; i++) cols.push(i);
-    shuffle(cols);
-    return cols.slice(0, Math.min(count, totalCols)).sort(function(a,b){ return a-b; });
-  }
 
   function tierForWord(word){
     var L = word.length;
@@ -868,23 +833,26 @@
     return 5;
   }
 
-  function lengthForRow(rowIndex, totalRows){
-    var progress = rowIndex / totalRows;
-    if (progress < 0.35) return pickRandom([3, 4, 4, 5]);
-    if (progress < 0.7) return pickRandom([5, 5, 6, 6]);
-    return pickRandom([6, 7, 7, 8]);
+  // Word-length pools per Trial, separately for Warden and Champion fights —
+  // the whole run eases from short/common words in Trial 1 up to long/harder
+  // words by Trial 3. Boss length is always fixed by BOSS_WORDS.
+  var TRIAL_LENGTH_POOLS = {
+    small: [[3, 4, 4, 5], [4, 5, 5, 6], [5, 6, 6, 7]],
+    big:   [[4, 4, 5, 5], [5, 5, 6, 6], [6, 6, 7, 7]]
+  };
+  function lengthForTrial(trialIndex, kind){
+    return pickRandom(TRIAL_LENGTH_POOLS[kind][trialIndex]);
   }
 
-  // Eases a fresh run in: the very first fight of a floor is capped to
-  // Common only, easing off by row depth until fights are fully unrestricted.
-  // Without this, tier is picked purely from a word's letters with no regard
-  // for how early it appears, so a brand-new run could open on an Arcane
-  // word — a plain "Fight" that plays like an Elite with none of the warning.
-  function maxTierForRow(rowIndex){
-    if (rowIndex === 0) return 1;
-    if (rowIndex <= 2) return 2;
-    if (rowIndex <= 4) return 3;
-    return null; // unrestricted from here on
+  // Eases a fresh run in: Wardens in the earlier Trials are capped below
+  // Arcane so a brand-new run can't open on a word that plays like a
+  // Champion fight with none of the warning. Champion/Boss set their own
+  // floor instead, via forceMinTier, so this only ever applies to Wardens.
+  function maxTierForTrial(trialIndex, kind){
+    if (kind !== 'small') return null;
+    if (trialIndex === 0) return 1; // Trial 1's Warden is the very first fight of the run — Common only
+    if (trialIndex === 1) return 2;
+    return null; // unrestricted from Trial 3 on
   }
 
   function pickWordAndTier(length, forceMinTier, forceMaxTier){
@@ -902,125 +870,50 @@
     return { word: word, length: length, tier: tier };
   }
 
-  function makeFightNode(row, col, floorIndex, rowIndex, opts){
-    opts = opts || {};
-    var length = opts.length || lengthForRow(rowIndex, ROWS_PER_FLOOR);
-    // Elites and bosses are deliberately hard and set their own floor via
-    // forceMinTier — the early-run ease-in only applies to plain fights.
-    var maxTier = (opts.elite || opts.boss) ? null : maxTierForRow(rowIndex);
-    var picked = pickWordAndTier(length, opts.forceMinTier, maxTier);
-    var bonus = opts.bonusSpoils || 0;
+  // Builds one encounter (Warden, Champion, or Boss) for the given Trial.
+  // Champion fights are deliberately tougher (forceMinTier 4, +3 bonus
+  // spoils — same numbers the old Elite nodes used) and Bosses always force
+  // the curated word for that Trial rather than a random pick.
+  function makeEncounterNode(trialIndex, encounterIndex){
+    var kind = ENCOUNTER_KINDS[encounterIndex];
+    if (kind === 'boss'){
+      var length = BOSS_WORDS[trialIndex].length;
+      var isFinal = trialIndex >= TRIAL_COUNT - 1;
+      var bossNode = {
+        trial: trialIndex, encounterIndex: encounterIndex, kind: 'boss', type: 'boss',
+        word: BOSS_WORDS[trialIndex], length: length, tier: 5,
+        hp: length * 2, atk: ATK_TABLE[5],
+        spoils: length + 5 + (isFinal ? 8 : 5),
+        bossLabel: BOSS_LABELS[trialIndex]
+      };
+      state.usedWords.add(bossNode.word);
+      return bossNode;
+    }
+    var isBig = kind === 'big';
+    var length = lengthForTrial(trialIndex, kind);
+    var maxTier = maxTierForTrial(trialIndex, kind);
+    var picked = pickWordAndTier(length, isBig ? 4 : null, maxTier);
+    var bonus = isBig ? 3 : 0;
     return {
-      id: floorIndex + '-' + row + '-' + col,
-      row: row, col: col,
-      type: opts.elite ? 'elite' : (opts.boss ? 'boss' : 'fight'),
+      trial: trialIndex, encounterIndex: encounterIndex, kind: kind, type: isBig ? 'elite' : 'fight',
       word: picked.word, length: picked.length, tier: picked.tier,
       hp: picked.length * 2, atk: ATK_TABLE[picked.tier],
       spoils: picked.length + picked.tier + bonus,
-      bossLabel: opts.bossLabel || null,
-      edgesOut: []
+      bossLabel: null
     };
   }
 
-  // ---------- floor graph generation ----------
-
-  function buildFloorGraph(floorIndex){
-    var rows = [];
-
-    for (var r = 0; r < ROWS_PER_FLOOR; r++){
-      var count = randInt(3, 4);
-      var cols = pickDistinctColumns(count, TOTAL_COLUMNS);
-      var nodes = cols.map(function(c){
-        var type = pickTypeForRow(r, c);
-        if (type === 'shop') return { id: floorIndex+'-'+r+'-'+c, row:r, col:c, type:'shop', edgesOut:[] };
-        if (type === 'rest') return { id: floorIndex+'-'+r+'-'+c, row:r, col:c, type:'rest', edgesOut:[] };
-        if (type === 'event') return { id: floorIndex+'-'+r+'-'+c, row:r, col:c, type:'event', edgesOut:[] };
-        if (type === 'elite') return makeFightNode(r, c, floorIndex, r, { elite:true, forceMinTier:4, bonusSpoils:3 });
-        return makeFightNode(r, c, floorIndex, r, {});
-      });
-      rows.push(nodes);
-    }
-
-    // boss row: single guaranteed convergence node
-    var isFinal = floorIndex >= FLOOR_COUNT - 1;
-    var bossRow = ROWS_PER_FLOOR;
-    var bossCol = Math.floor(TOTAL_COLUMNS / 2);
-    var bossNode = makeFightNode(bossRow, bossCol, floorIndex, ROWS_PER_FLOOR, {
-      boss: true,
-      length: BOSS_WORDS[floorIndex].length,
-      forceMinTier: 5,
-      bonusSpoils: isFinal ? 8 : 5,
-      bossLabel: BOSS_LABELS[floorIndex]
-    });
-    // force the curated boss word directly rather than a random pick of that length
-    bossNode.word = BOSS_WORDS[floorIndex];
-    bossNode.tier = 5;
-    bossNode.hp = bossNode.length * 2;
-    bossNode.atk = ATK_TABLE[5];
-    bossNode.spoils = bossNode.length + 5 + (isFinal ? 8 : 5);
-    rows.push([bossNode]);
-
-    // edges: connect each row to the next, favoring nearby columns, then
-    // guarantee no orphaned node (every non-start node has >=1 incoming edge)
-    for (var ri = 0; ri < rows.length - 1; ri++){
-      rows[ri].forEach(function(node){
-        var nextRow = rows[ri + 1];
-        var near = nextRow.filter(function(n){ return Math.abs(n.col - node.col) <= 1; });
-        if (!near.length){
-          near = [nextRow.slice().sort(function(a,b){
-            return Math.abs(a.col - node.col) - Math.abs(b.col - node.col);
-          })[0]];
-        }
-        var edgeCount = (Math.random() < 0.3 && near.length > 1) ? 2 : 1;
-        var chosen = shuffle(near.slice()).slice(0, edgeCount);
-        node.edgesOut = chosen.map(function(n){ return n.id; });
-      });
-      var thisRow = rows[ri];
-      rows[ri + 1].forEach(function(target){
-        var hasIncoming = thisRow.some(function(n){ return n.edgesOut.indexOf(target.id) !== -1; });
-        if (!hasIncoming){
-          var nearest = thisRow.slice().sort(function(a,b){
-            return Math.abs(a.col - target.col) - Math.abs(b.col - target.col);
-          })[0];
-          nearest.edgesOut.push(target.id);
-        }
-      });
-    }
-
-    var nodesById = {};
-    rows.forEach(function(row){ row.forEach(function(n){ nodesById[n.id] = n; }); });
-
-    return { rows: rows, nodesById: nodesById, floorIndex: floorIndex };
+  function buildTrialEncounters(trialIndex){
+    return [makeEncounterNode(trialIndex, 0), makeEncounterNode(trialIndex, 1), makeEncounterNode(trialIndex, 2)];
   }
 
-  function pickTypeForRow(r, c){
-    if (r === 0) return 'fight';
-    // The whole row right before the boss is a guaranteed rest — no matter
-    // which column your path lands on, you heal to full before a boss fight.
-    if (r === ROWS_PER_FLOOR - 1) return 'rest';
-    // Periodic guaranteed checkpoint rows, same reasoning: a random per-node
-    // chance of a rest node meant many paths never crossed one at all.
-    // Skip the row directly before the guaranteed pre-boss rest row above —
-    // otherwise a floor can force two full-heal rows back to back.
-    if (r > 0 && r !== ROWS_PER_FLOOR - 2 && r % REST_CHECKPOINT_EVERY === 0) return 'rest';
-    if (r === 1) return Math.random() < 0.75 ? 'fight' : 'event';
-    var roll = Math.random();
-    if (roll < 0.45) return 'fight';
-    if (roll < 0.65) return 'event';
-    if (roll < 0.77) return 'shop';
-    if (roll < 0.90) return 'elite';
-    return 'rest';
-  }
-
-  // ---------- run / floor lifecycle ----------
+  // ---------- run / Trial lifecycle ----------
 
   function freshRunState(){
     return {
-      floorIndex: 0,
-      graph: null,
-      currentNodeId: null,
-      path: [],
-      visited: {},
+      trial: 0,
+      encounters: null,
+      encounterStep: 0,
       usedWords: new Set(),
       playerHP: MAX_HP,
       shield: 0,
@@ -1030,9 +923,6 @@
       totalDealt: 0,
       totalTaken: 0,
       fightsCleared: 0,
-      pendingSkip: false,
-      pendingWingsRange: 0,
-      pendingWingsItemId: null,
       maxGuessesMultiplier: 1,
       duelWield: false,
       ended: false,
@@ -1056,7 +946,7 @@
 
   function offerStartingPower(){
     currentPowerOffer = pickRandom(POWERS);
-    document.getElementById('map-view').classList.add('hidden');
+    document.getElementById('run-view').classList.add('hidden');
     document.getElementById('shop-view').classList.add('hidden');
     document.getElementById('arena').classList.add('hidden');
     document.getElementById('power-view').classList.remove('hidden');
@@ -1095,43 +985,30 @@
   function finishStartingPower(){
     currentPowerOffer = null;
     document.getElementById('power-view').classList.add('hidden');
-    state.graph = buildFloorGraph(0);
-    showMap();
+    startTrial(0);
   }
 
-  function startFloor(){
-    var healed = state.playerHP < MAX_HP;
+  // Starts (or restarts, at a Trial boundary) a Trial: rebuilds its 3
+  // encounters (Warden, Champion, Boss) and heals to full HP — this is the
+  // only HP-reset point in the run now (replacing the old scattered
+  // mid-floor rest-checkpoint system).
+  function startTrial(trialIndex){
+    var healed = state.encounters !== null && state.playerHP < MAX_HP;
+    state.trial = trialIndex;
+    state.encounters = buildTrialEncounters(trialIndex);
+    state.encounterStep = 0;
     state.playerHP = MAX_HP;
-    state.graph = buildFloorGraph(state.floorIndex);
-    state.currentNodeId = null;
-    state.path = [];
-    state.visited = {};
-    if (healed) log('New floor — you catch your breath. HP restored to full.', 'event-shop');
-    showMap();
-  }
-
-  // Moves the player's cursor onto `node` and records it in the ordered
-  // path so the map can tell exactly which edges were actually walked.
-  function advanceCursor(node){
-    state.currentNodeId = node.id;
-    state.path.push(node.id);
-  }
-
-  function wasEdgeTraveled(fromId, toId){
-    for (var i = 0; i < state.path.length - 1; i++){
-      if (state.path[i] === fromId && state.path[i + 1] === toId) return true;
-    }
-    return false;
+    if (healed) log('New Trial — you catch your breath. HP restored to full.', 'event-shop');
+    showRunScreen();
   }
 
   // ---------- shared chrome ----------
 
   function renderTopbar(){
-    document.getElementById('floor-badge').textContent = 'Floor ' + (state.floorIndex + 1) + ' / ' + FLOOR_COUNT;
     document.getElementById('spoils-value').textContent = state.spoils;
     document.getElementById('shield-value').textContent = state.shield;
     document.getElementById('xp-value').textContent = xpBank;
-    document.getElementById('progress-value').textContent = 'Floor ' + (state.floorIndex + 1) + ' / ' + FLOOR_COUNT;
+    document.getElementById('progress-value').textContent = 'Trial ' + (state.trial + 1) + ' / ' + TRIAL_COUNT;
     renderHearts();
     renderInventory();
   }
@@ -1164,8 +1041,8 @@
       case 'potion':    return 'Heals ' + value + ' HP. Usable anytime, including mid-fight.';
       case 'orb':       return 'Reveals ' + value + ' letter' + (value > 1 ? 's' : '') + ' that exist in the word — not their position. Fight only.';
       case 'telescope': return 'Reveals one letter in its exact position, free of charge. Fight only.';
-      case 'boots':     return 'Skip your next Fight or Elite pick on the map entirely — no fight, no spoils, no risk. Cannot skip a Boss.';
-      case 'wings':     return 'Jump to any node up to ' + value + ' rows ahead on the map, bypassing normal connections.';
+      case 'boots':     return 'Skip your current Warden or Champion fight entirely — no fight, no spoils, no risk. Cannot skip the Boss.';
+      case 'wings':     return 'From the Warden, soar straight past the Champion to the Shop before the Boss. Cannot skip the Boss.';
       case 'revive':    return 'If you would fall to 0 HP, come back instead at ' + value + ' HP. Consumed once, automatically, the moment it matters.';
       case 'leaf':      return 'Reveals what kind of thing the word relates to (e.g. "an animal") — a theme hint, not a letter. Fight only.';
       default:          return '';
@@ -1177,16 +1054,16 @@
       case 'potion':    return 'Potion +' + item.value + ' HP';
       case 'orb':       return 'Orb x' + item.value;
       case 'telescope': return 'Telescope';
-      case 'boots':     return 'Sneaky Boots' + (state.pendingSkip ? ' (armed)' : '');
-      case 'wings':     return 'Wings ' + item.value + (state.pendingWingsItemId === item.id ? ' (armed)' : '');
+      case 'boots':     return 'Sneaky Boots';
+      case 'wings':     return 'Wings';
       case 'revive':    return 'Revive ' + item.value;
       case 'leaf':      return 'Leaf of Truth';
       default:          return item.kind;
     }
   }
 
-  function isMapVisible(){
-    return !document.getElementById('map-view').classList.contains('hidden');
+  function isRunScreenVisible(){
+    return !document.getElementById('run-view').classList.contains('hidden');
   }
 
   function isItemUsableNow(item){
@@ -1195,8 +1072,10 @@
       case 'orb':
       case 'telescope':
       case 'leaf':      return !!fight;
-      case 'boots':     return isMapVisible() && !state.pendingSkip;
-      case 'wings':     return isMapVisible() && !state.pendingWingsRange;
+      // Boots can act on the current encounter as long as it isn't the Boss.
+      case 'boots':     return isRunScreenVisible() && state.encounters[state.encounterStep].kind !== 'boss';
+      // Wings only makes sense while standing on the Warden fight.
+      case 'wings':     return isRunScreenVisible() && state.encounterStep === 0;
       case 'revive':    return false; // passive — never manually triggered
       default:          return false;
     }
@@ -1307,17 +1186,24 @@
       renderInventory();
       renderTelescopeGhosts();
     } else if (item.kind === 'boots'){
-      if (fight || !isMapVisible() || state.pendingSkip) return;
-      state.pendingSkip = true;
-      log('Sneaky Boots readied — your next Fight or Elite pick will be skipped instead of fought.', 'event-shop');
-      renderInventory();
+      // Immediate-resolution: no branching path to pick a destination on
+      // anymore, so Boots just skips the current encounter outright. Never
+      // usable on the Boss (checked by isItemUsableNow too).
+      if (fight || !isRunScreenVisible()) return;
+      var bootsNode = state.encounters[state.encounterStep];
+      if (bootsNode.kind === 'boss') return;
+      state.inventory.splice(idx, 1);
+      log('Sneaky Boots — slipped past the ' + (bootsNode.kind === 'big' ? 'Champion' : 'Warden') + ' fight entirely. No fight, no spoils.', 'event-shop');
+      advanceEncounter('skipped');
     } else if (item.kind === 'wings'){
-      if (fight || !isMapVisible() || state.pendingWingsRange) return;
-      state.pendingWingsRange = item.value;
-      state.pendingWingsItemId = item.id;
-      log('Wings unfurled — pick any node up to ' + item.value + ' rows ahead.', 'event-shop');
-      renderInventory();
-      renderMap();
+      // Only usable standing on the Warden fight: jumps straight to the Shop
+      // that precedes the Boss, skipping the Champion fight entirely. The
+      // Boss itself can never be skipped by any item.
+      if (fight || !isRunScreenVisible() || state.encounterStep !== 0) return;
+      state.inventory.splice(idx, 1);
+      log('Wings unfurled — soared past the Champion fight straight to the Shop before the Boss.', 'event-shop');
+      state.encounterStep = 2;
+      goToShopThen(showRunScreen);
     } else if (item.kind === 'leaf'){
       if (!fight) return;
       state.inventory.splice(idx, 1);
@@ -1363,37 +1249,15 @@
 
   // ---------- map rendering ----------
 
-  var NODE_SIZE = 40;
-  var ROW_HEIGHT = 64;
-  var COL_WIDTH = 62;
-  var CANVAS_PAD = 30;
-
-  function availableNodeIds(){
-    if (state.pendingWingsRange){
-      var curRow = state.currentNodeId === null ? -1 : state.graph.nodesById[state.currentNodeId].row;
-      var maxRow = curRow + state.pendingWingsRange;
-      var ids = [];
-      state.graph.rows.forEach(function(rowNodes){
-        rowNodes.forEach(function(n){
-          if (n.row > curRow && n.row <= maxRow) ids.push(n.id);
-        });
-      });
-      return ids;
-    }
-    if (state.currentNodeId === null) return state.graph.rows[0].map(function(n){ return n.id; });
-    var cur = state.graph.nodesById[state.currentNodeId];
-    return cur ? cur.edgesOut.slice() : [];
-  }
-
-  function showMap(){
+  function showRunScreen(){
     fight = null;
     document.getElementById('arena').classList.add('hidden');
     document.getElementById('shop-view').classList.add('hidden');
     document.getElementById('power-view').classList.add('hidden');
     document.getElementById('end-banner').classList.add('hidden');
-    document.getElementById('map-view').classList.remove('hidden');
+    document.getElementById('run-view').classList.remove('hidden');
     renderTopbar();
-    renderMap();
+    renderRunScreen();
     renderWordLog();
   }
 
@@ -1426,158 +1290,55 @@
     fill('word-log-escaped', 'word-log-escaped-count', state.escapedWords, 'None yet.');
   }
 
-  function nodeLabel(node){
-    if (node.type === 'shop') return 'Shop — spend spoils';
-    if (node.type === 'rest') return 'Rest — heal to full';
-    if (node.type === 'event') return 'Unknown event';
-    var kind = node.type === 'boss' ? (node.bossLabel || 'Boss') : (node.type === 'elite' ? 'Elite' : 'Fight');
-    return kind + ': L' + node.length + ' · ' + TIERS[node.tier].name + ' · ' + node.hp + ' HP · atk ' + node.atk + '/rd · +' + node.spoils + ' spoils';
+  var ENCOUNTER_DISPLAY = { small: 'Warden', big: 'Champion' }; // boss uses node.bossLabel instead
+
+  function renderRunScreen(){
+    document.getElementById('trial-badge').textContent = 'Trial ' + (state.trial + 1) + ' / ' + TRIAL_COUNT;
+
+    var track = document.getElementById('encounter-track');
+    track.innerHTML = '';
+    ENCOUNTER_KINDS.forEach(function(kind, i){
+      var pip = document.createElement('div');
+      pip.className = 'encounter-pip type-' + kind;
+      var status = i < state.encounterStep ? 'done' : (i === state.encounterStep ? 'current' : 'upcoming');
+      pip.setAttribute('data-status', status);
+      pip.textContent = kind === 'boss' ? 'BOSS' : (kind === 'big' ? 'CHAMPION' : 'WARDEN');
+      track.appendChild(pip);
+    });
+
+    var node = state.encounters[state.encounterStep];
+    var tier = TIERS[node.tier];
+    var card = document.getElementById('encounter-card');
+    card.style.setProperty('--tier-color', tier.color);
+    card.innerHTML =
+      '<div class="encounter-eyebrow">' + (node.kind === 'boss' ? (node.bossLabel || 'Boss') : ENCOUNTER_DISPLAY[node.kind]) + '</div>' +
+      '<div class="encounter-stats">' +
+        '<span class="encounter-stat" style="color:' + tier.color + '">' + tier.name + '</span>' +
+        '<span class="encounter-stat">L' + node.length + '</span>' +
+        '<span class="encounter-stat">' + node.hp + ' HP</span>' +
+        '<span class="encounter-stat">atk ' + node.atk + '/rd</span>' +
+        '<span class="encounter-stat gold">+' + node.spoils + ' spoils</span>' +
+      '</div>' +
+      '<button class="encounter-fight-btn" id="encounter-fight-btn" type="button">Fight</button>';
+    document.getElementById('encounter-fight-btn').addEventListener('click', function(){ startEncounterFight(node); });
   }
 
-  function renderMap(){
-    var graph = state.graph;
-    var totalRows = ROWS_PER_FLOOR + 1;
-    var canvas = document.getElementById('map-canvas');
-    var svg = document.getElementById('map-edges');
-    canvas.querySelectorAll('.map-node-wrap').forEach(function(el){ el.remove(); });
-
-    var width = CANVAS_PAD * 2 + (TOTAL_COLUMNS - 1) * COL_WIDTH + NODE_SIZE;
-    var height = CANVAS_PAD * 2 + (totalRows - 1) * ROW_HEIGHT + NODE_SIZE;
-    canvas.style.width = width + 'px';
-    canvas.style.height = height + 'px';
-    svg.setAttribute('width', width);
-    svg.setAttribute('height', height);
-    svg.innerHTML = '';
-
-    function xFor(col){ return CANVAS_PAD + col * COL_WIDTH; }
-    function yFor(row){ return CANVAS_PAD + (totalRows - 1 - row) * ROW_HEIGHT; }
-
-    var available = availableNodeIds();
-    var currentInfoWrap = document.getElementById('map-current-info');
-    currentInfoWrap.innerHTML = '';
-
-    // edges first (so nodes draw on top)
-    graph.rows.forEach(function(rowNodes){
-      rowNodes.forEach(function(node){
-        node.edgesOut.forEach(function(targetId){
-          var target = graph.nodesById[targetId];
-          var traveled = wasEdgeTraveled(node.id, targetId);
-          var line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-          line.setAttribute('x1', xFor(node.col) + NODE_SIZE/2);
-          line.setAttribute('y1', yFor(node.row) + NODE_SIZE/2);
-          line.setAttribute('x2', xFor(target.col) + NODE_SIZE/2);
-          line.setAttribute('y2', yFor(target.row) + NODE_SIZE/2);
-          line.setAttribute('stroke', traveled ? '#8a6a30' : '#332e40');
-          line.setAttribute('stroke-width', traveled ? '2.5' : '1.5');
-          svg.appendChild(line);
-        });
-      });
-    });
-
-    graph.rows.forEach(function(rowNodes){
-      rowNodes.forEach(function(node){
-        var wrap = document.createElement('div');
-        wrap.className = 'map-node-wrap';
-        wrap.style.left = xFor(node.col) + 'px';
-        wrap.style.top = yFor(node.row) + 'px';
-
-        var visitedResult = state.visited[node.id];
-        var status = visitedResult ? visitedResult : (available.indexOf(node.id) !== -1 ? 'current' : 'unreached');
-        wrap.setAttribute('data-status', status);
-
-        var dot = document.createElement('button');
-        dot.type = 'button';
-        dot.className = 'map-dot type-' + node.type;
-        if (node.type === 'fight' || node.type === 'elite' || node.type === 'boss'){
-          dot.style.setProperty('--node-color', TIERS[node.tier].color);
-          dot.textContent = node.type === 'boss' ? 'BOSS' : node.length;
-        } else if (node.type === 'shop'){
-          dot.textContent = '$';
-        } else if (node.type === 'rest'){
-          dot.textContent = '+';
-        } else if (node.type === 'event'){
-          dot.textContent = '?';
-        }
-        dot.title = nodeLabel(node);
-        if (status === 'current'){
-          dot.addEventListener('click', function(){ selectNode(node); });
-        } else {
-          dot.disabled = true;
-        }
-        wrap.appendChild(dot);
-        canvas.appendChild(wrap);
-      });
-    });
-
-    available.forEach(function(id){
-      var node = graph.nodesById[id];
-      var row = document.createElement('div');
-      row.className = 'current-option';
-      row.innerHTML = '<span>' + nodeLabel(node) + '</span><strong>Pick ↑</strong>';
-      currentInfoWrap.appendChild(row);
-    });
-
-    var scroller = document.getElementById('map-scroll');
-    var targetRow = state.currentNodeId === null ? 0 : graph.nodesById[state.currentNodeId].row;
-    var targetY = yFor(targetRow);
-    requestAnimationFrame(function(){
-      scroller.scrollTop = Math.max(0, targetY - scroller.clientHeight * 0.65);
-    });
-  }
-
-  function selectNode(node){
-    if (state.pendingSkip && (node.type === 'fight' || node.type === 'elite')){
-      state.pendingSkip = false;
-      var bootsIdx = state.inventory.findIndex(function(it){ return it.kind === 'boots'; });
-      if (bootsIdx !== -1) state.inventory.splice(bootsIdx, 1);
-      state.visited[node.id] = 'skipped';
-      advanceCursor(node);
-      log('Slipped past ' + (node.type === 'elite' ? 'an Elite' : 'a Fight') + ' using Sneaky Boots — no spoils, no risk.', 'event-shop');
-      renderInventory();
-      showMap();
-      return;
-    }
-    if (state.pendingWingsRange){
-      state.pendingWingsRange = 0;
-      var wingsIdx = state.inventory.findIndex(function(it){ return it.id === state.pendingWingsItemId; });
-      if (wingsIdx !== -1) state.inventory.splice(wingsIdx, 1);
-      state.pendingWingsItemId = null;
-      renderInventory();
-    }
-    if (node.type === 'shop'){ openShop(node); return; }
-    if (node.type === 'rest'){ resolveRest(node); return; }
-    if (node.type === 'event'){ resolveEvent(node); return; }
-    document.getElementById('map-view').classList.add('hidden');
+  function startEncounterFight(node){
+    document.getElementById('run-view').classList.add('hidden');
     document.getElementById('arena').classList.remove('hidden');
     startFight(node);
   }
 
-  function resolveRest(node){
-    var before = state.playerHP;
-    state.playerHP = MAX_HP;
-    state.visited[node.id] = 'visited';
-    log('Rested — healed ' + (state.playerHP - before) + ' HP to full.', 'event-shop');
-    advanceCursor(node);
-    renderTopbar();
-    showMap();
-  }
-
-  function resolveEvent(node){
-    var outcome = pickRandom(EVENT_OUTCOMES);
-    var n = outcome.apply(state);
-    state.visited[node.id] = 'visited';
-    log(outcome.text.replace('{n}', n), 'event-shop');
-    advanceCursor(node);
-    if (checkDeathOrRevive('An unlucky event finished the run.')) return;
-    renderTopbar();
-    showMap();
-  }
-
   // ---------- shop ----------
+  // A pure Shop follows every single encounter resolution now (won, escaped,
+  // or skipped via Boots/Wings) — there's no more Rest/Event node in between.
+  // goToShopThen() stashes what should happen once the player leaves.
 
-  function openShop(node){
-    currentShopOpt = node;
-    document.getElementById('map-view').classList.add('hidden');
+  var shopContinueCallback = null;
+
+  function goToShopThen(afterCb){
+    shopContinueCallback = afterCb;
+    document.getElementById('run-view').classList.add('hidden');
     document.getElementById('shop-view').classList.remove('hidden');
     var pool = SHOP_CATALOG.slice();
     shuffle(pool);
@@ -1624,13 +1385,11 @@
   }
 
   function leaveShop(){
-    var node = currentShopOpt;
-    state.visited[node.id] = 'visited';
-    advanceCursor(node);
-    currentShopOpt = null;
     currentOffers = null;
     document.getElementById('shop-view').classList.add('hidden');
-    showMap();
+    var cb = shopContinueCallback;
+    shopContinueCallback = null;
+    if (cb) cb();
   }
 
   // ---------- fight ----------
@@ -1836,7 +1595,7 @@
 
     document.getElementById('guess-input').value = '';
 
-    if (checkDeathOrRevive('Fell to a ' + node.length + '-letter ' + TIERS[node.tier].name.toLowerCase() + ' word on Floor ' + (state.floorIndex + 1) + '.')){
+    if (checkDeathOrRevive('Fell to a ' + node.length + '-letter ' + TIERS[node.tier].name.toLowerCase() + ' word on Trial ' + (state.trial + 1) + '.')){
       return;
     }
 
@@ -1858,13 +1617,13 @@
 
     if (fight.guessesUsed >= effectiveMaxGuesses()){
       log('Out of guesses — the word slips away unsolved.' + (beaten ? ' It was already beaten — you keep the XP earned grinding it down, but no spoils.' : ' No reward this fight.'), 'event-danger');
-      // advanceFromNode() finishes on a setTimeout (map transition / floor
-      // change), leaving a brief window where the guess form is still live.
-      // Clear `fight` now, synchronously, so a fast double-submit in that
-      // window can't re-trigger advanceFromNode a second time.
+      // advanceEncounter() finishes on a setTimeout in some branches (Trial
+      // transition), leaving a brief window where the guess form is still
+      // live. Clear `fight` now, synchronously, so a fast double-submit in
+      // that window can't re-trigger advanceEncounter a second time.
       document.getElementById('guess-input').blur();
       fight = null;
-      advanceFromNode(node, 'escaped');
+      advanceEncounter('escaped');
       return;
     }
 
@@ -1873,8 +1632,8 @@
 
   // Shows a "word completed" popup with the word and this fight's stats
   // before actually advancing — makes a kill feel like an event instead of
-  // silently dumping the player back on the map. Continue triggers the real
-  // advanceFromNode(), which is where spoils/XP/floor-transition logic lives.
+  // silently dumping the player back on the run screen. Continue triggers the
+  // real advanceEncounter(), which is where spoils/XP/Trial-transition logic lives.
   function showFightResult(node, wasAlreadyBeaten, totalOverkillXp){
     var tier = TIERS[node.tier];
     document.getElementById('fight-result-card').style.setProperty('--tier-color', tier.color);
@@ -1904,11 +1663,17 @@
     overlay.classList.remove('hidden');
     document.getElementById('fr-continue').onclick = function(){
       overlay.classList.add('hidden');
-      advanceFromNode(node, 'won');
+      advanceEncounter('won');
     };
   }
 
-  function advanceFromNode(node, result){
+  // Resolves the current encounter (state.encounters[state.encounterStep])
+  // and figures out what comes next. A Shop always follows — whether the
+  // encounter was won, escaped, or skipped via Boots — except after the
+  // very last (final-boss) encounter of the run, which ends the run outright
+  // instead.
+  function advanceEncounter(result){
+    var node = state.encounters[state.encounterStep];
     if (result === 'won'){
       state.spoils += node.spoils;
       state.fightsCleared++;
@@ -1917,32 +1682,26 @@
     } else if (result === 'escaped'){
       state.escapedWords.push({ word: node.word, length: node.length, tier: node.tier, type: node.type });
     }
-    state.visited[node.id] = result;
-    advanceCursor(node);
+    // 'skipped' (via Boots) lands in neither list — the word was never fought.
 
-    if (node.type === 'boss'){
-      var isFinal = state.floorIndex >= FLOOR_COUNT - 1;
-      if (result === 'won'){
-        if (isFinal){
-          endRun(true, 'Cleared all ' + FLOOR_COUNT + ' floors — the final boss falls.');
-          return;
-        }
-        state.floorIndex++;
-        setTimeout(startFloor, 250);
-        return;
-      } else {
-        if (isFinal){
+    var wasBoss = node.kind === 'boss';
+    state.encounterStep++;
+
+    if (wasBoss){
+      var isFinal = state.trial >= TRIAL_COUNT - 1;
+      if (isFinal){
+        if (result === 'won'){
+          endRun(true, 'Cleared all ' + TRIAL_COUNT + ' Trials — the final boss falls.');
+        } else {
           endRun(false, 'Reached the final boss and survived, but it slipped away unsolved.', 'Boss Escaped');
-          return;
         }
-        // survived a mini-boss escape: still move on to the next floor
-        state.floorIndex++;
-        setTimeout(startFloor, 250);
         return;
       }
+      goToShopThen(function(){ setTimeout(function(){ startTrial(state.trial + 1); }, 250); });
+      return;
     }
 
-    setTimeout(showMap, 200);
+    goToShopThen(showRunScreen);
   }
 
   // Renders every available guess row up front, empty, the way real Wordle
@@ -1998,7 +1757,7 @@
   function endRun(victory, subtitle, titleOverride){
     state.ended = true;
     document.getElementById('arena').classList.add('hidden');
-    document.getElementById('map-view').classList.add('hidden');
+    document.getElementById('run-view').classList.add('hidden');
     document.getElementById('shop-view').classList.add('hidden');
     var banner = document.getElementById('end-banner');
     banner.classList.remove('hidden', 'victory', 'defeat');
@@ -2009,7 +1768,7 @@
     stats.innerHTML = '';
     var entries = [
       ['Fights won', state.fightsCleared],
-      ['Floor reached', (state.floorIndex + 1) + ' / ' + FLOOR_COUNT],
+      ['Trial reached', (state.trial + 1) + ' / ' + TRIAL_COUNT],
       ['Spoils earned', state.spoils],
       ['Shield remaining', state.shield],
       ['Damage dealt', state.totalDealt],
