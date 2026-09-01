@@ -693,7 +693,7 @@
     <div class="debug-row">
       <label>Danger zone</label>
       <button type="button" class="danger" id="debug-kill-self">Kill me instantly</button>
-      <button type="button" class="danger" id="debug-reset-run">Reset to basics</button>
+      <button type="button" class="danger" id="debug-reset-run" title="Restarts the run from scratch: full HP, no items, no shield, no spoils, and banked XP wiped to 0.">Reset to basics</button>
     </div>
   </div>
 </div>
@@ -1914,6 +1914,13 @@
     });
 
     document.getElementById('debug-reset-run').addEventListener('click', function(){
+      // startRun() -> freshRunState() already zeroes spoils and shield for
+      // the new run; XP is deliberately persistent meta-progression
+      // (survives across runs via localStorage), so it's the one thing this
+      // debug reset has to clear out itself to actually get back to a truly
+      // blank baseline.
+      xpBank = 0;
+      saveXpBank(xpBank);
       startRun();
     });
   })();
