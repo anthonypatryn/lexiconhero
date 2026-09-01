@@ -93,6 +93,8 @@
   .stat-value.gold{color:var(--gold);}
   .stat-value.steel{color:var(--steel);}
   .stat-value.xp{color:var(--tier-3);}
+  .stat-value.mana{color:var(--tier-2);}
+  .stat-block.hidden{display:none;}
   .hearts{display:flex; gap:4px;}
   .heart{width:22px; height:22px;}
   .heart-outline{fill:var(--ink-3); stroke:var(--muted); stroke-width:1;}
@@ -155,6 +157,16 @@
   }
   .item-chip button:hover:not(:disabled){filter:brightness(1.25);}
   .item-chip button:disabled{opacity:0.4; cursor:not-allowed;}
+  .mana-panel{display:flex; gap:8px; flex-wrap:wrap;}
+  .mana-panel.hidden{display:none;}
+  .mana-panel button{
+    display:flex; align-items:center; gap:6px;
+    font-family:var(--font-mono); font-weight:700; font-size:11.5px; letter-spacing:0.03em;
+    background:var(--ink-1); border:1px solid var(--tier-2); color:var(--tier-2);
+    border-radius:var(--radius-m); padding:8px 12px; cursor:pointer;
+  }
+  .mana-panel button:hover:not(:disabled){background:rgba(79,143,176,0.15);}
+  .mana-panel button:disabled{opacity:0.4; cursor:not-allowed; border-color:var(--ink-3); color:var(--muted);}
   .item-passive-tag{
     font-family:var(--font-body); font-weight:700; font-size:10px; letter-spacing:0.06em; text-transform:uppercase;
     color:var(--crimson); border:1px solid var(--crimson); border-radius:3px; padding:4px 8px; opacity:0.85;
@@ -226,18 +238,76 @@
 
   .encounter-card{
     --tier-color: var(--gold);
-    display:flex; flex-direction:column; align-items:center; gap:10px;
-    background:var(--ink-0);
-    border:1px solid var(--tier-color);
+    position:relative;
+    display:flex; flex-direction:column; align-items:center; gap:0;
+    background:var(--ink-1);
+    border:2px solid var(--tier-color);
     border-radius:var(--radius-m);
-    padding:24px 18px;
+    padding:14px 16px 16px;
     text-align:center;
+    max-width:280px;
+    margin:0 auto;
+    box-shadow:0 0 0 1px rgba(0,0,0,0.3), 0 14px 34px rgba(0,0,0,0.45);
   }
-  .encounter-eyebrow{font-family:var(--font-display); font-size:16px; letter-spacing:0.05em; color:var(--tier-color);}
-  .encounter-stats{display:flex; flex-wrap:wrap; justify-content:center; gap:14px; font-family:var(--font-mono); font-size:12px; color:var(--bone-dim);}
-  .encounter-stat.gold{color:var(--gold);}
+  .card-level-badge{
+    position:absolute; top:-10px; left:-10px;
+    width:30px; height:30px;
+    border-radius:50%;
+    background:var(--tier-color);
+    color:#0d0a06;
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--font-display); font-weight:900; font-size:13px;
+    border:2px solid var(--ink-0);
+    box-shadow:0 0 10px var(--tier-color);
+    z-index:2;
+  }
+  .card-portrait{
+    width:100%;
+    aspect-ratio:1.15/1;
+    max-height:150px;
+    border-radius:var(--radius-s);
+    background:
+      radial-gradient(ellipse at 50% 30%, color-mix(in srgb, var(--tier-color) 30%, transparent), transparent 70%),
+      var(--ink-0);
+    border:1px solid var(--ink-3);
+    display:flex; align-items:center; justify-content:center;
+    margin-bottom:10px;
+  }
+  .creature-icon{width:64%; height:64%; overflow:visible;}
+  .creature-icon .ci-fill{fill:var(--tier-color);}
+  .creature-icon .ci-line{fill:none; stroke:var(--ink-0); stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round;}
+  .creature-icon .ci-eye{fill:var(--ink-0);}
+  .creature-icon .ci-eye-glow{fill:var(--bone);}
+  .card-name-banner{margin-bottom:8px;}
+  .card-name{display:block; font-family:var(--font-display); font-weight:900; font-size:17px; letter-spacing:0.03em; color:var(--bone);}
+  .card-subtitle{display:block; font-family:var(--font-mono); font-size:10.5px; letter-spacing:0.06em; text-transform:uppercase; color:var(--tier-color); margin-top:2px;}
+  .card-stat-row{display:flex; justify-content:center; gap:8px; margin-bottom:10px; flex-wrap:wrap;}
+  .card-stat{
+    display:flex; align-items:center; gap:4px;
+    background:var(--ink-2); border:1px solid var(--ink-3); border-radius:999px;
+    padding:4px 10px;
+    font-family:var(--font-mono); font-weight:700; font-size:12px; color:var(--bone-dim);
+  }
+  .card-stat svg{width:13px; height:13px; flex:none;}
+  .card-stat.hp{color:var(--bone);}
+  .card-stat.hp svg{fill:var(--crimson);}
+  .card-stat.atk svg{fill:var(--steel);}
+  .card-stat.gold{color:var(--gold);}
+  .card-stat.gold svg{fill:var(--gold);}
+  .card-flavor{
+    width:100%;
+    background:var(--ink-0);
+    border:1px solid var(--ink-3);
+    border-radius:var(--radius-s);
+    padding:8px 10px;
+    font-size:11.5px; line-height:1.4; color:var(--bone-dim); font-style:italic;
+    min-height:32px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .card-flavor.has-hint{color:var(--steel); font-style:normal; font-weight:600;}
   .encounter-fight-btn{
-    margin-top:4px;
+    margin-top:12px;
+    width:100%;
     padding:10px 28px;
     border-radius:var(--radius-s);
     border:1px solid var(--tier-color);
@@ -247,6 +317,19 @@
     cursor:pointer;
   }
   .encounter-fight-btn:hover{filter:brightness(1.12);}
+  .encounter-flee-btn{
+    margin-top:6px;
+    width:100%;
+    padding:8px 20px;
+    border-radius:var(--radius-s);
+    border:1px solid var(--steel-dim);
+    background:transparent;
+    color:var(--steel);
+    font-family:var(--font-body); font-weight:700; font-size:12px; letter-spacing:0.03em;
+    cursor:pointer;
+  }
+  .encounter-flee-btn:hover{border-color:var(--steel); background:rgba(111,155,181,0.1);}
+  .encounter-flee-btn:disabled{opacity:0.35; cursor:default; background:transparent;}
 
   .word-log{
     display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:4px;
@@ -337,8 +420,8 @@
   }
   #shop-continue:hover{filter:brightness(1.2);}
 
-  /* --- Starting Power view --- */
-  .power-view{
+  /* --- Class select view (replaces the old random Starting Power roll) --- */
+  .class-view{
     background:var(--ink-1);
     border:1px solid var(--tier-3);
     border-radius:var(--radius-m);
@@ -347,31 +430,39 @@
     flex-direction:column;
     gap:14px;
   }
-  .power-view.hidden{display:none;}
-  .power-view h2{font-family:var(--font-display); font-size:22px; margin:0 0 4px; letter-spacing:0.04em; color:var(--tier-3);}
-  .power-view p{margin:0; font-size:12.5px; color:var(--muted);}
-  .power-card{
-    display:flex; flex-direction:column; gap:6px;
-    background:var(--ink-2); border:1px solid var(--tier-3); border-radius:var(--radius-m);
-    padding:16px;
+  .class-view.hidden{display:none;}
+  .class-view h2{font-family:var(--font-display); font-size:22px; margin:0 0 4px; letter-spacing:0.04em; color:var(--tier-3);}
+  .class-view p{margin:0; font-size:12.5px; color:var(--muted);}
+  .class-offers{display:flex; gap:14px; flex-wrap:wrap;}
+  .class-card{
+    flex:1 1 220px; min-width:220px;
+    display:flex; flex-direction:column; gap:8px;
+    background:var(--ink-2); border:1px solid var(--class-color, var(--tier-3)); border-radius:var(--radius-m);
+    padding:14px;
   }
-  .power-name{font-family:var(--font-display); font-weight:700; font-size:17px; color:var(--bone);}
-  .power-desc{font-size:12.5px; color:var(--bone-dim); line-height:1.5;}
-  .power-cost{font-family:var(--font-mono); font-weight:700; font-size:13px; color:var(--tier-3);}
-  .power-actions{display:flex; gap:10px; justify-content:flex-end;}
-  #power-buy{
-    font-family:var(--font-mono); font-weight:700; font-size:13px; letter-spacing:0.03em;
-    background:var(--tier-3); color:#1b1826; border:none; border-radius:var(--radius-s);
-    padding:10px 18px; cursor:pointer;
+  .class-card-head{display:flex; align-items:baseline; justify-content:space-between; gap:6px;}
+  .class-name{font-family:var(--font-display); font-weight:700; font-size:16px; color:var(--class-color, var(--bone));}
+  .class-level-tag{font-family:var(--font-mono); font-size:10.5px; letter-spacing:0.05em; color:var(--muted); text-transform:uppercase;}
+  .class-ability-list{display:flex; flex-direction:column; gap:5px; margin:2px 0;}
+  .class-ability{font-size:11.5px; line-height:1.4; padding:6px 8px; border-radius:var(--radius-s); background:var(--ink-1); border:1px solid var(--ink-3);}
+  .class-ability.unlocked{color:var(--bone-dim); border-color:var(--class-color, var(--tier-3));}
+  .class-ability.locked{color:var(--muted); opacity:0.7;}
+  .class-ability .ability-tag{font-family:var(--font-mono); font-weight:700; text-transform:uppercase; font-size:9.5px; letter-spacing:0.05em; margin-right:5px;}
+  .class-ability.unlocked .ability-tag{color:var(--class-color, var(--tier-3));}
+  .class-actions{display:flex; flex-direction:column; gap:6px; margin-top:auto;}
+  .class-levelup-btn{
+    font-family:var(--font-mono); font-weight:700; font-size:12px; letter-spacing:0.03em;
+    background:var(--class-color, var(--tier-3)); color:#0d0a06; border:none; border-radius:var(--radius-s);
+    padding:8px 14px; cursor:pointer;
   }
-  #power-buy:hover:not(:disabled){filter:brightness(1.1);}
-  #power-buy:disabled{background:var(--ink-3); color:var(--muted); cursor:not-allowed;}
-  #power-skip{
-    font-family:var(--font-body); font-weight:700; font-size:13px; letter-spacing:0.04em; text-transform:uppercase;
+  .class-levelup-btn:hover:not(:disabled){filter:brightness(1.1);}
+  .class-levelup-btn:disabled{background:var(--ink-3); color:var(--muted); cursor:not-allowed;}
+  .class-play-btn{
+    font-family:var(--font-body); font-weight:700; font-size:13px; letter-spacing:0.03em; text-transform:uppercase;
     background:var(--ink-3); color:var(--bone); border:none; border-radius:var(--radius-s);
-    padding:10px 18px; cursor:pointer;
+    padding:9px 14px; cursor:pointer;
   }
-  #power-skip:hover{filter:brightness(1.2);}
+  .class-play-btn:hover{filter:brightness(1.2);}
 
   /* --- Fight arena --- */
   .arena{display:flex; flex-direction:column; gap:18px;}
@@ -567,23 +658,24 @@
       <span class="eyebrow">Shield</span>
       <span class="stat-value steel" id="shield-value">0</span>
     </div>
-    <div class="stat-block" title="Banked XP — carries across runs, even after a defeat. Spend it on a Power at the start of your next run.">
+    <div class="stat-block" title="Banked XP — carries across runs, even after a defeat. Spend it to permanently level up a class.">
       <span class="eyebrow">XP Bank</span>
       <span class="stat-value xp" id="xp-value">0</span>
+    </div>
+    <div class="stat-block hidden" id="mana-stat-block" title="Mana — a Mage resource. Spend it during a fight to reveal information. Refills to full every Trial.">
+      <span class="eyebrow">Mana</span>
+      <span class="stat-value mana" id="mana-value">0 / 0</span>
     </div>
     <div class="hearts" id="hearts"></div>
   </div>
 
   <div class="inventory-bar hidden" id="inventory-bar"></div>
+  <div class="mana-panel hidden" id="mana-panel"></div>
 
-  <div class="power-view hidden" id="power-view">
-    <h2>Starting Power</h2>
-    <p>Spend your banked XP — earned from past runs, even ones that ended in defeat — on a random Power for this run.</p>
-    <div id="power-offer"></div>
-    <div class="power-actions">
-      <button id="power-skip" type="button">Skip</button>
-      <button id="power-buy" type="button">Buy</button>
-    </div>
+  <div class="class-view hidden" id="class-view">
+    <h2>Choose Your Class</h2>
+    <p>Every class is available from run one. Spend banked XP to permanently level one up — level-ups persist across every future run, defeats included.</p>
+    <div class="class-offers" id="class-offers"></div>
   </div>
 
   <div class="run-view" id="run-view">
@@ -686,14 +778,28 @@
       <button type="button" id="debug-give-item">Add to pack</button>
     </div>
     <div class="debug-row">
-      <label>Starting power</label>
-      <select id="debug-power-select"></select>
-      <button type="button" id="debug-give-power">Issue power</button>
+      <label>Grant XP</label>
+      <button type="button" id="debug-grant-xp">+50 XP</button>
+    </div>
+    <div class="debug-row">
+      <label>Force class level (persistent)</label>
+      <select id="debug-class-select">
+        <option value="warrior">Warrior</option>
+        <option value="mage">Mage</option>
+        <option value="rogue">Rogue</option>
+      </select>
+      <select id="debug-class-level-select">
+        <option value="0">Lv 0</option>
+        <option value="1">Lv 1</option>
+        <option value="2">Lv 2</option>
+        <option value="3">Lv 3</option>
+      </select>
+      <button type="button" id="debug-set-class-level">Set</button>
     </div>
     <div class="debug-row">
       <label>Danger zone</label>
       <button type="button" class="danger" id="debug-kill-self">Kill me instantly</button>
-      <button type="button" class="danger" id="debug-reset-run" title="Restarts the run from scratch: full HP, no items, no shield, no spoils, and banked XP wiped to 0.">Reset to basics</button>
+      <button type="button" class="danger" id="debug-reset-run" title="Restarts the run from scratch: full HP, no items, no shield, no spoils, banked XP wiped to 0, and all class levels reset to 0.">Reset to basics</button>
     </div>
   </div>
 </div>
@@ -768,34 +874,76 @@
     renderTopbar();
   }
 
-  // Offered one-at-a-time at the start of a run, bought with banked XP.
-  // XP itself is earned per word defeated using the same length+tier
-  // formula as Spoils, but — unlike Spoils, which resets every run — XP
-  // is saved to localStorage and persists across runs and defeats.
-  var POWERS = [
-    { id: 'revive2',     name: 'Revive Charm',         cost: 8,  desc: 'Start the run holding a Revive 2 — if you would fall to 0 HP, come back instead at 2 HP.',
-      apply: function(s){ s.inventory.push({ id: s.nextItemId++, kind: 'revive', value: 2 }); } },
-    { id: 'revive4',     name: 'Greater Revive Charm', cost: 14, desc: 'Start the run holding a Revive 4 — if you would fall to 0 HP, come back instead at 4 HP.',
-      apply: function(s){ s.inventory.push({ id: s.nextItemId++, kind: 'revive', value: 4 }); } },
-    { id: 'sandtimer',   name: 'Sandtimer',            cost: 12, desc: 'Doubles your guess cap for every fight this run (6 → 12).',
-      apply: function(s){ s.maxGuessesMultiplier = 2; } },
-    { id: 'helmet',      name: 'Helmet',               cost: 6,  desc: 'Start the run with 2 permanent shield.',
-      apply: function(s){ s.shield += 2; } },
-    { id: 'towershield', name: 'Tower Shield',         cost: 10, desc: 'Start the run with 4 permanent shield.',
-      apply: function(s){ s.shield += 4; } },
-    { id: 'duelwield',   name: 'Duel Wield',           cost: 14, desc: 'Every green tile deals 3 damage instead of 2. Damage beyond what was needed to defeat the enemy converts to bonus XP instead of going to waste.',
-      apply: function(s){ s.duelWield = true; } }
+  // ---------- Classes (replaces the old random Starting-Power roll) ----------
+  // Every class is playable from run one, even at level 0 (no bonus yet).
+  // Banked XP now buys permanent Class levels instead of a one-run Power —
+  // a level, once bought, stays bought forever, across every future run,
+  // defeats included. Levels are cumulative: Level 2 keeps Level 1's effect.
+  // Placeholder tuning — costs/effects are a first pass, easy to rebalance
+  // later without touching the level-up flow itself.
+  var CLASSES = [
+    { id: 'warrior', name: 'Warrior', color: '#d1495b',
+      levels: [
+        { cost: 6,  name: 'Braced',     desc: 'Start the run with +2 permanent shield.' },
+        { cost: 12, name: 'Undying',    desc: 'The first time you would fall to 0 HP this run, come back instead at half HP.' },
+        { cost: 18, name: 'Fortified',  desc: 'Your shield absorbs 50% more damage before it breaks.' }
+      ] },
+    { id: 'mage', name: 'Mage', color: '#4f8fb0',
+      levels: [
+        { cost: 6,  name: 'Arcane Sight',   desc: 'Start with 3 Mana. Spend 1 Mana anytime in a fight to reveal a letter in its exact position.' },
+        { cost: 12, name: 'Deep Reserves',  desc: '+2 max Mana (5 total). Mana refills to full at every Trial-boundary heal.' },
+        { cost: 18, name: 'Insight',        desc: 'Spend 2 Mana anytime in a fight to reveal a theme hint for the word, like Leaf of Truth.' }
+      ] },
+    { id: 'rogue', name: 'Rogue', color: '#e3a53d',
+      levels: [
+        { cost: 6,  name: 'Sneak Attack',   desc: 'Your free opening guess each fight deals 50% bonus damage.' },
+        { cost: 12, name: 'Vanish',         desc: 'Once per Trial, flee your current Warden or Champion fight for free — no item needed. Cannot flee a Boss.' },
+        { cost: 18, name: 'Light Fingers',  desc: '+2 bonus Spoils on every fight you win.' }
+      ] }
   ];
+
+  var CLASS_LEVELS_KEY = 'lexiconHero_classLevels';
+  function loadClassLevels(){
+    try {
+      var raw = JSON.parse(localStorage.getItem(CLASS_LEVELS_KEY));
+      if (raw && typeof raw === 'object') return raw;
+    } catch (e){ /* fall through to defaults */ }
+    return { warrior: 0, mage: 0, rogue: 0 };
+  }
+  function saveClassLevels(){
+    try { localStorage.setItem(CLASS_LEVELS_KEY, JSON.stringify(classLevels)); } catch (e){ /* private mode etc */ }
+  }
+  var classLevels = loadClassLevels();
 
   // ---------- Balatro-shaped run structure, dungeon-flavored: fixed 3 Trials x 3 encounters ----------
   // Each Trial is Warden -> Champion -> Boss, in that order, always fought
   // (never branched) — a Shop follows every single encounter resolution (won,
   // escaped, or skipped via Boots/Wings). HP resets to full at the start of
-  // every Trial. The 3 curated boss words map 1:1 onto the 3 Trials.
+  // every Trial. Each Trial's Boss is a fixed, named monster (for run-to-run
+  // narrative identity), but the actual secret word it guards is randomly
+  // rolled fresh every run (see makeEncounterNode) for replayability — you
+  // always face "The Bonecaster" on Trial 1, but never the same word twice.
   var TRIAL_COUNT = 3;
   var ENCOUNTER_KINDS = ['small', 'big', 'boss']; // internal slugs only — user-facing names are Warden/Champion/Boss
-  var BOSS_WORDS = ['gambit', 'phoenix', 'quixotic'];
   var BOSS_LABELS = ['Mini-Boss', 'Mini-Boss', 'Final Boss'];
+
+  // ---------- creatures ----------
+  // Warden/Champion fights draw a random creature name from their tier's
+  // family each time (flavor variety on top of the word/length variety
+  // already there); Bosses are fixed per Trial slot instead, so the run's
+  // 3 bosses read as a recognizable, escalating trio of named monsters.
+  var CREATURE_FAMILIES = {
+    1: ['Rat', 'Bat', 'Slime'],
+    2: ['Goblin', 'Skeleton', 'Kobold'],
+    3: ['Orc', 'Ghoul', 'Bandit'],
+    4: ['Troll', 'Wraith', 'Ogre']
+    // tier 5 is Boss-only — see BOSS_CREATURES below, never rolled randomly.
+  };
+  var BOSS_CREATURES = ['The Bonecaster', 'Ashwing', 'The Mad Wyrm'];
+  function creatureForNode(tier, trialIndex, kind){
+    if (kind === 'boss') return BOSS_CREATURES[trialIndex];
+    return pickRandom(CREATURE_FAMILIES[tier] || CREATURE_FAMILIES[4]);
+  }
 
   // Enemy attack-per-round, keyed by obscurity tier. Deliberately flatter than
   // the 1-5 tier scale itself: since harder words already take more guesses
@@ -835,12 +983,14 @@
     return 5;
   }
 
-  // Word-length pools per Trial, separately for Warden and Champion fights —
-  // the whole run eases from short/common words in Trial 1 up to long/harder
-  // words by Trial 3. Boss length is always fixed by BOSS_WORDS.
+  // Word-length pools per Trial, separately for Warden, Champion, and Boss
+  // fights — the whole run eases from short/common words in Trial 1 up to
+  // long/harder words by Trial 3. Boss lengths run a notch above Champion's,
+  // since Bosses are always forced to tier 5 regardless of the word rolled.
   var TRIAL_LENGTH_POOLS = {
     small: [[3, 4, 4, 5], [4, 5, 5, 6], [5, 6, 6, 7]],
-    big:   [[4, 4, 5, 5], [5, 5, 6, 6], [6, 6, 7, 7]]
+    big:   [[4, 4, 5, 5], [5, 5, 6, 6], [6, 6, 7, 7]],
+    boss:  [[5, 6], [6, 7], [7, 8]]
   };
   function lengthForTrial(trialIndex, kind){
     return pickRandom(TRIAL_LENGTH_POOLS[kind][trialIndex]);
@@ -872,24 +1022,36 @@
     return { word: word, length: length, tier: tier };
   }
 
+  // Free automatic difficulty hint: Common/Uncommon fights show a WordNet
+  // theme category right on the card (eased onboarding); Rare and up show
+  // nothing, so the training wheels come off as the run gets harder. Bosses
+  // are always tier 5, so they never get one — same as Rare+.
+  function hintForNode(word, tier){
+    return tier <= 2 ? themeHintForWord(word) : null;
+  }
+
   // Builds one encounter (Warden, Champion, or Boss) for the given Trial.
   // Champion fights are deliberately tougher (forceMinTier 4, +3 bonus
-  // spoils — same numbers the old Elite nodes used) and Bosses always force
-  // the curated word for that Trial rather than a random pick.
+  // spoils — same numbers the old Elite nodes used). Bosses force tier 5 but,
+  // for replayability, roll a fresh random word (at a Boss-appropriate
+  // length) every run instead of reusing a fixed curated word — the boss's
+  // *name* (see BOSS_CREATURES) is what stays fixed per Trial slot, not the
+  // word it guards.
   function makeEncounterNode(trialIndex, encounterIndex){
     var kind = ENCOUNTER_KINDS[encounterIndex];
     if (kind === 'boss'){
-      var length = BOSS_WORDS[trialIndex].length;
+      var bossLength = lengthForTrial(trialIndex, 'boss');
+      var bossPicked = pickWordAndTier(bossLength, 5, null);
       var isFinal = trialIndex >= TRIAL_COUNT - 1;
-      var bossNode = {
+      return {
         trial: trialIndex, encounterIndex: encounterIndex, kind: 'boss', type: 'boss',
-        word: BOSS_WORDS[trialIndex], length: length, tier: 5,
-        hp: length * 2, atk: ATK_TABLE[5],
-        spoils: length + 5 + (isFinal ? 8 : 5),
-        bossLabel: BOSS_LABELS[trialIndex]
+        word: bossPicked.word, length: bossPicked.length, tier: bossPicked.tier,
+        hp: bossPicked.length * 2, atk: ATK_TABLE[bossPicked.tier],
+        spoils: bossPicked.length + 5 + (isFinal ? 8 : 5),
+        bossLabel: BOSS_LABELS[trialIndex],
+        creature: creatureForNode(bossPicked.tier, trialIndex, 'boss'),
+        hint: null
       };
-      state.usedWords.add(bossNode.word);
-      return bossNode;
     }
     var isBig = kind === 'big';
     var length = lengthForTrial(trialIndex, kind);
@@ -901,7 +1063,9 @@
       word: picked.word, length: picked.length, tier: picked.tier,
       hp: picked.length * 2, atk: ATK_TABLE[picked.tier],
       spoils: picked.length + picked.tier + bonus,
-      bossLabel: null
+      bossLabel: null,
+      creature: creatureForNode(picked.tier, trialIndex, kind),
+      hint: hintForNode(picked.word, picked.tier)
     };
   }
 
@@ -911,6 +1075,14 @@
 
   // ---------- run / Trial lifecycle ----------
 
+  // Adds shield, respecting Warrior's Fortified (Lv3) 50%-more-absorption
+  // perk. Every source that grants shield (class start, shop buy, debug
+  // grant) should route through this rather than touching state.shield
+  // directly, so the multiplier never gets silently skipped somewhere.
+  function addShield(amount){
+    state.shield += Math.round(amount * (state.shieldMult || 1));
+  }
+
   function freshRunState(){
     return {
       trial: 0,
@@ -919,6 +1091,7 @@
       usedWords: new Set(),
       playerHP: MAX_HP,
       shield: 0,
+      shieldMult: 1,
       spoils: 0,
       inventory: [],
       nextItemId: 1,
@@ -929,7 +1102,20 @@
       duelWield: false,
       ended: false,
       defeatedWords: [],
-      escapedWords: []
+      escapedWords: [],
+      // Class-derived fields — set once at run start by applyClassToState(),
+      // based on whichever class is chosen and its currently-unlocked level.
+      playerClass: null,
+      classLevel: 0,
+      mana: 0,
+      maxMana: 0,
+      warriorRevive: false,
+      warriorReviveUsed: false,
+      sneakAttack: false,
+      mageInsight: false,
+      rogueFreeFlee: false,
+      rogueFreeFleeUsedThisTrial: false,
+      rogueBonusSpoils: 0
     };
   }
 
@@ -937,69 +1123,116 @@
     return MAX_GUESSES * (state.maxGuessesMultiplier || 1);
   }
 
-  var currentPowerOffer = null;
+  // Applies every unlocked level (1..level, cumulative) of the chosen class
+  // to a fresh run's state. Called once, right before the run's first Trial.
+  function applyClassToState(classId, level){
+    state.playerClass = classId;
+    state.classLevel = level;
+    if (classId === 'warrior'){
+      if (level >= 1) addShield(2);
+      if (level >= 2) state.warriorRevive = true;
+      if (level >= 3) state.shieldMult = 1.5;
+    } else if (classId === 'mage'){
+      if (level >= 1){ state.mana = 3; state.maxMana = 3; }
+      if (level >= 2){ state.maxMana = 5; state.mana = 5; }
+      if (level >= 3){ state.mageInsight = true; }
+    } else if (classId === 'rogue'){
+      if (level >= 1) state.sneakAttack = true;
+      if (level >= 2) state.rogueFreeFlee = true;
+      if (level >= 3) state.rogueBonusSpoils = 2;
+    }
+  }
+
+  var CLASS_ICONS = { warrior: '⚔', mage: '✦', rogue: '🗡' };
 
   function startRun(){
     state = freshRunState();
     document.getElementById('end-banner').classList.add('hidden');
     document.getElementById('log').innerHTML = '';
-    offerStartingPower();
+    offerClassSelect();
   }
 
-  function offerStartingPower(){
-    currentPowerOffer = pickRandom(POWERS);
+  function offerClassSelect(){
     document.getElementById('run-view').classList.add('hidden');
     document.getElementById('shop-view').classList.add('hidden');
     document.getElementById('arena').classList.add('hidden');
-    document.getElementById('power-view').classList.remove('hidden');
+    document.getElementById('class-view').classList.remove('hidden');
     renderTopbar();
-    renderPowerOffer();
+    renderClassOffers();
   }
 
-  function renderPowerOffer(){
-    var power = currentPowerOffer;
-    var canAfford = xpBank >= power.cost;
-    document.getElementById('power-offer').innerHTML =
-      '<div class="power-card">' +
-        '<span class="power-name">' + power.name + '</span>' +
-        '<span class="power-desc">' + power.desc + '</span>' +
-        '<span class="power-cost">' + power.cost + ' XP</span>' +
-      '</div>';
-    var buyBtn = document.getElementById('power-buy');
-    buyBtn.disabled = !canAfford;
-    buyBtn.textContent = canAfford ? 'Buy for ' + power.cost + ' XP' : 'Not enough XP (' + xpBank + ' banked)';
+  function renderClassOffers(){
+    var wrap = document.getElementById('class-offers');
+    wrap.innerHTML = '';
+    CLASSES.forEach(function(cls){
+      var level = classLevels[cls.id] || 0;
+      var card = document.createElement('div');
+      card.className = 'class-card';
+      card.style.setProperty('--class-color', cls.color);
+      var abilitiesHtml = cls.levels.map(function(lvl, i){
+        var unlocked = i < level;
+        return '<div class="class-ability ' + (unlocked ? 'unlocked' : 'locked') + '">' +
+          '<span class="ability-tag">Lv' + (i + 1) + (unlocked ? ' ✓' : ' 🔒') + '</span>' +
+          '<strong>' + lvl.name + '</strong> — ' + lvl.desc +
+        '</div>';
+      }).join('');
+      var nextLevel = cls.levels[level]; // undefined once maxed
+      var levelUpHtml = nextLevel
+        ? '<button class="class-levelup-btn" data-class="' + cls.id + '"' + (xpBank < nextLevel.cost ? ' disabled' : '') + '>' +
+            'Level Up — ' + nextLevel.cost + ' XP' +
+          '</button>'
+        : '<button class="class-levelup-btn" disabled>Maxed out</button>';
+      card.innerHTML =
+        '<div class="class-card-head">' +
+          '<span class="class-name">' + (CLASS_ICONS[cls.id] || '') + ' ' + cls.name + '</span>' +
+          '<span class="class-level-tag">Lv ' + level + ' / ' + cls.levels.length + '</span>' +
+        '</div>' +
+        '<div class="class-ability-list">' + abilitiesHtml + '</div>' +
+        '<div class="class-actions">' +
+          levelUpHtml +
+          '<button class="class-play-btn" data-class="' + cls.id + '">Play as ' + cls.name + '</button>' +
+        '</div>';
+      card.querySelector('.class-levelup-btn').addEventListener('click', function(){ levelUpClass(cls.id); });
+      card.querySelector('.class-play-btn').addEventListener('click', function(){ chooseClass(cls.id); });
+      wrap.appendChild(card);
+    });
   }
 
-  function buyPower(){
-    var power = currentPowerOffer;
-    if (!power || xpBank < power.cost) return;
-    xpBank -= power.cost;
+  function levelUpClass(classId){
+    var cls = CLASSES.find(function(c){ return c.id === classId; });
+    var level = classLevels[classId] || 0;
+    var nextLevel = cls.levels[level];
+    if (!nextLevel || xpBank < nextLevel.cost) return;
+    xpBank -= nextLevel.cost;
     saveXpBank(xpBank);
-    power.apply(state);
-    log('Starting Power: ' + power.name + ' — ' + power.desc, 'event-kill');
-    finishStartingPower();
+    classLevels[classId] = level + 1;
+    saveClassLevels();
+    renderTopbar();
+    renderClassOffers();
   }
 
-  function skipPower(){
-    finishStartingPower();
-  }
-
-  function finishStartingPower(){
-    currentPowerOffer = null;
-    document.getElementById('power-view').classList.add('hidden');
+  function chooseClass(classId){
+    var level = classLevels[classId] || 0;
+    applyClassToState(classId, level);
+    var cls = CLASSES.find(function(c){ return c.id === classId; });
+    log('Playing as ' + cls.name + ' (Lv ' + level + ').', 'event-kill');
+    document.getElementById('class-view').classList.add('hidden');
     startTrial(0);
   }
 
   // Starts (or restarts, at a Trial boundary) a Trial: rebuilds its 3
-  // encounters (Warden, Champion, Boss) and heals to full HP — this is the
-  // only HP-reset point in the run now (replacing the old scattered
-  // mid-floor rest-checkpoint system).
+  // encounters (Warden, Champion, Boss), heals to full HP, refills Mana (for
+  // Mage), and resets the once-per-Trial free-flee flag (for Rogue) — this
+  // is the only reset point for all of those now (replacing the old
+  // scattered mid-floor rest-checkpoint system).
   function startTrial(trialIndex){
     var healed = state.encounters !== null && state.playerHP < MAX_HP;
     state.trial = trialIndex;
     state.encounters = buildTrialEncounters(trialIndex);
     state.encounterStep = 0;
     state.playerHP = MAX_HP;
+    if (state.maxMana > 0) state.mana = state.maxMana;
+    state.rogueFreeFleeUsedThisTrial = false;
     if (healed) log('New Trial — you catch your breath. HP restored to full.', 'event-shop');
     showRunScreen();
   }
@@ -1011,6 +1244,13 @@
     document.getElementById('shield-value').textContent = state.shield;
     document.getElementById('xp-value').textContent = xpBank;
     document.getElementById('progress-value').textContent = 'Trial ' + (state.trial + 1) + ' / ' + TRIAL_COUNT;
+    var manaBlock = document.getElementById('mana-stat-block');
+    if (state.maxMana > 0){
+      manaBlock.classList.remove('hidden');
+      document.getElementById('mana-value').textContent = state.mana + ' / ' + state.maxMana;
+    } else {
+      manaBlock.classList.add('hidden');
+    }
     renderHearts();
     renderInventory();
   }
@@ -1093,6 +1333,7 @@
   }
 
   function renderInventory(){
+    renderManaPanel();
     var bar = document.getElementById('inventory-bar');
     bar.innerHTML = '';
     if (!state.inventory.length){
@@ -1129,8 +1370,63 @@
     });
   }
 
-  // Auto-triggers a held Revive charm when HP would hit 0. Returns true if
-  // the run actually ended (no revive available), false if play continues.
+  // ---------- Mage abilities (Mana-gated, not inventory items) ----------
+  // Repeatable, resource-gated versions of Telescope/Leaf of Truth — unlike
+  // those items, using one doesn't consume it, only Mana, which refills
+  // every Trial. Panel only renders anything once a Mage has reached Lv1.
+  function renderManaPanel(){
+    var panel = document.getElementById('mana-panel');
+    if (!state || state.maxMana <= 0){
+      panel.classList.add('hidden');
+      panel.innerHTML = '';
+      return;
+    }
+    panel.classList.remove('hidden');
+    var canRevealLetter = !!fight && state.mana >= 1;
+    var html = '<button type="button" id="mana-reveal-letter"' + (canRevealLetter ? '' : ' disabled') + '>Reveal Letter (1 Mana)</button>';
+    if (state.mageInsight){
+      var canThemeHint = !!fight && state.mana >= 2;
+      html += '<button type="button" id="mana-theme-hint"' + (canThemeHint ? '' : ' disabled') + '>Theme Hint (2 Mana)</button>';
+    }
+    panel.innerHTML = html;
+    document.getElementById('mana-reveal-letter').addEventListener('click', mageRevealLetter);
+    if (state.mageInsight) document.getElementById('mana-theme-hint').addEventListener('click', mageThemeHint);
+  }
+
+  function mageRevealLetter(){
+    if (!fight || state.mana < 1) return;
+    var unknownPositions = [];
+    for (var i = 0; i < fight.node.length; i++){
+      if (fight.bestState[i] !== 'green') unknownPositions.push(i);
+    }
+    if (!unknownPositions.length){
+      log('Arcane Sight finds nothing new — every position is already known.', 'event-shop');
+      return;
+    }
+    state.mana -= 1;
+    var pos = pickRandom(unknownPositions);
+    var letter = fight.node.word[pos];
+    fight.telescoped[pos] = letter;
+    log('Spent 1 Mana (Arcane Sight) — position ' + (pos + 1) + ' is "' + letter.toUpperCase() + '".', 'event-kill');
+    renderKnownLetters();
+    renderTopbar();
+    renderTelescopeGhosts();
+  }
+
+  function mageThemeHint(){
+    if (!fight || state.mana < 2) return;
+    state.mana -= 2;
+    var hint = themeHintForWord(fight.node.word);
+    log('Spent 2 Mana (Insight) — ' + hint, 'event-kill');
+    showLeafReveal(hint);
+    renderTopbar();
+  }
+
+  // Auto-triggers a held Revive charm (or, failing that, a Warrior's Undying
+  // perk) when HP would hit 0. Returns true if the run actually ended (no
+  // revive available), false if play continues. Item Revives are checked
+  // first since they're consumed either way; Undying is a once-per-run
+  // fallback that doesn't need an inventory slot.
   function checkDeathOrRevive(deathMessage){
     if (state.playerHP > 0) return false;
     var reviveIdx = state.inventory.findIndex(function(it){ return it.kind === 'revive'; });
@@ -1139,6 +1435,14 @@
       state.inventory.splice(reviveIdx, 1);
       state.playerHP = reviveItem.value;
       log('A Revive charm flares to life — pulled back from the brink at ' + reviveItem.value + ' HP!', 'event-kill');
+      renderTopbar();
+      renderInventory();
+      return false;
+    }
+    if (state.warriorRevive && !state.warriorReviveUsed){
+      state.warriorReviveUsed = true;
+      state.playerHP = Math.floor(MAX_HP / 2);
+      log('Undying — refuses to fall, and rises again at half HP!', 'event-kill');
       renderTopbar();
       renderInventory();
       return false;
@@ -1255,7 +1559,7 @@
     fight = null;
     document.getElementById('arena').classList.add('hidden');
     document.getElementById('shop-view').classList.add('hidden');
-    document.getElementById('power-view').classList.add('hidden');
+    document.getElementById('class-view').classList.add('hidden');
     document.getElementById('end-banner').classList.add('hidden');
     document.getElementById('run-view').classList.remove('hidden');
     renderTopbar();
@@ -1294,6 +1598,79 @@
 
   var ENCOUNTER_DISPLAY = { small: 'Warden', big: 'Champion' }; // boss uses node.bossLabel instead
 
+  // ---------- creature portrait icons ----------
+  // Simple flat-color monster silhouettes, keyed by creature name. Body
+  // shapes use the .ci-fill class (tier-colored via CSS), so the same icon
+  // set reads as "obviously tougher" the further up the tier list you go
+  // without needing separate art per tier.
+  var CREATURE_ICON_PATHS = {
+    'Rat': '<path class="ci-fill" d="M8 44 Q6 34 18 32 L40 30 Q52 30 52 40 Q52 48 42 50 L18 50 Q8 49 8 44 Z"/>' +
+      '<circle class="ci-fill" cx="46" cy="34" r="9"/>' +
+      '<path class="ci-fill" d="M40 24 L34 12 L44 22 Z"/><path class="ci-fill" d="M50 22 L56 11 L48 20 Z"/>' +
+      '<path class="ci-line" d="M10 44 Q0 40 2 52 Q4 58 12 54"/>' +
+      '<circle class="ci-eye" cx="49" cy="32" r="1.8"/>',
+    'Bat': '<path class="ci-fill" d="M2 30 Q16 14 26 30 Q28 22 32 22 Q36 22 38 30 Q48 14 62 30 Q50 34 42 30 Q44 40 36 44 L32 40 L28 44 Q20 40 22 30 Q14 34 2 30 Z"/>' +
+      '<circle class="ci-fill" cx="32" cy="30" r="7"/>' +
+      '<path class="ci-fill" d="M27 22 L26 14 L31 22 Z"/><path class="ci-fill" d="M37 22 L38 14 L33 22 Z"/>' +
+      '<circle class="ci-eye" cx="29" cy="29" r="1.6"/><circle class="ci-eye" cx="35" cy="29" r="1.6"/>',
+    'Slime': '<path class="ci-fill" d="M32 12 Q50 16 50 34 Q50 50 32 50 Q14 50 14 34 Q14 16 32 12 Z"/>' +
+      '<circle class="ci-eye" cx="26" cy="34" r="2.2"/><circle class="ci-eye" cx="38" cy="34" r="2.2"/>' +
+      '<path class="ci-line" d="M22 42 Q32 47 42 42"/>',
+    'Goblin': '<circle class="ci-fill" cx="32" cy="34" r="16"/>' +
+      '<path class="ci-fill" d="M17 28 L4 20 L16 38 Z"/><path class="ci-fill" d="M47 28 L60 20 L48 38 Z"/>' +
+      '<path class="ci-fill" d="M27 46 L32 54 L37 46 Z"/>' +
+      '<circle class="ci-eye" cx="27" cy="32" r="2"/><circle class="ci-eye" cx="38" cy="32" r="2"/>',
+    'Skeleton': '<path class="ci-fill" d="M32 12 Q48 12 48 28 Q48 38 42 40 L46 50 L38 46 L32 52 L26 46 L18 50 L22 40 Q16 38 16 28 Q16 12 32 12 Z"/>' +
+      '<circle class="ci-eye" cx="25" cy="27" r="3.6"/><circle class="ci-eye" cx="39" cy="27" r="3.6"/>' +
+      '<path class="ci-line" d="M27 36 L37 36 M29 39 L35 39"/>',
+    'Kobold': '<circle class="ci-fill" cx="32" cy="36" r="15"/>' +
+      '<path class="ci-fill" d="M22 22 L18 10 L27 20 Z"/><path class="ci-fill" d="M42 22 L46 10 L37 20 Z"/>' +
+      '<path class="ci-fill" d="M16 32 L6 26 L15 40 Z"/><path class="ci-fill" d="M48 32 L58 26 L49 40 Z"/>' +
+      '<circle class="ci-eye" cx="27" cy="35" r="1.8"/><circle class="ci-eye" cx="37" cy="35" r="1.8"/>',
+    'Orc': '<path class="ci-fill" d="M14 30 Q14 12 32 12 Q50 12 50 30 Q50 48 32 50 Q14 48 14 30 Z"/>' +
+      '<path class="ci-line" d="M18 26 Q32 18 46 26"/>' +
+      '<path class="ci-eye-glow" d="M22 44 L26 52 L28 43 Z"/><path class="ci-eye-glow" d="M42 44 L38 52 L36 43 Z"/>' +
+      '<circle class="ci-eye" cx="25" cy="30" r="2"/><circle class="ci-eye" cx="39" cy="30" r="2"/>',
+    'Ghoul': '<ellipse class="ci-fill" cx="32" cy="32" rx="15" ry="20"/>' +
+      '<circle class="ci-eye" cx="25" cy="28" r="4"/><circle class="ci-eye" cx="39" cy="28" r="4"/>' +
+      '<path class="ci-line" d="M22 42 L27 46 L32 41 L37 46 L42 42"/>',
+    'Bandit': '<path class="ci-fill" d="M16 34 Q16 12 32 10 Q48 12 48 34 Q48 50 32 52 Q16 50 16 34 Z"/>' +
+      '<path class="ci-line" d="M14 30 Q32 40 50 30"/>' +
+      '<rect class="ci-eye" x="22" y="27" width="7" height="3"/><rect class="ci-eye" x="35" y="27" width="7" height="3"/>',
+    'Troll': '<path class="ci-fill" d="M10 40 Q8 16 32 14 Q56 16 54 40 Q54 54 32 54 Q10 54 10 40 Z"/>' +
+      '<circle class="ci-fill" cx="18" cy="34" r="4"/><circle class="ci-fill" cx="46" cy="30" r="3"/>' +
+      '<path class="ci-eye-glow" d="M29 44 L32 52 L35 44 Z"/>' +
+      '<circle class="ci-eye" cx="26" cy="28" r="2.2"/><circle class="ci-eye" cx="40" cy="26" r="2.2"/>',
+    'Wraith': '<path class="ci-fill" d="M32 8 Q48 14 46 30 L52 54 L44 46 L38 54 L32 47 L26 54 L20 46 L12 54 L18 30 Q16 14 32 8 Z"/>' +
+      '<path class="ci-eye-glow" d="M25 26 L29 26 L27 32 Z"/><path class="ci-eye-glow" d="M39 26 L35 26 L37 32 Z"/>',
+    'Ogre': '<path class="ci-fill" d="M6 44 Q4 18 32 16 Q60 18 58 44 Q58 54 32 54 Q6 54 6 44 Z"/>' +
+      '<circle class="ci-eye" cx="22" cy="30" r="2.4"/><circle class="ci-eye" cx="42" cy="30" r="2.4"/>' +
+      '<path class="ci-eye-glow" d="M18 42 L23 50 L25 41 Z"/><path class="ci-eye-glow" d="M46 42 L41 50 L39 41 Z"/>' +
+      '<path class="ci-line" d="M14 22 Q10 12 18 10"/>',
+    // Bosses: fixed, larger/more elaborate silhouettes for the three named Trial bosses.
+    'The Bonecaster': '<path class="ci-fill" d="M32 14 Q50 14 50 32 Q50 42 43 44 L47 54 L39 49 L32 56 L25 49 L17 54 L21 44 Q14 42 14 32 Q14 14 32 14 Z"/>' +
+      '<path class="ci-fill" d="M18 14 L14 4 L22 12 Z"/><path class="ci-fill" d="M46 14 L50 4 L42 12 Z"/><path class="ci-fill" d="M32 8 L32 0 L37 8 Z"/>' +
+      '<circle class="ci-eye-glow" cx="25" cy="29" r="4"/><circle class="ci-eye-glow" cx="39" cy="29" r="4"/>' +
+      '<path class="ci-line" d="M27 38 L37 38"/>',
+    'Ashwing': '<path class="ci-fill" d="M32 20 Q40 24 38 40 Q37 50 32 54 Q27 50 26 40 Q24 24 32 20 Z"/>' +
+      '<path class="ci-fill" d="M28 26 Q4 18 2 40 Q16 36 28 34 Z"/><path class="ci-fill" d="M36 26 Q60 18 62 40 Q48 36 36 34 Z"/>' +
+      '<path class="ci-fill" d="M28 46 L20 58 L30 52 Z"/><path class="ci-fill" d="M36 46 L44 58 L34 52 Z"/>' +
+      '<circle class="ci-fill" cx="32" cy="16" r="7"/><circle class="ci-eye" cx="32" cy="15" r="1.8"/>',
+    'The Mad Wyrm': '<path class="ci-fill" d="M14 50 Q12 30 24 24 Q20 16 28 10 Q36 4 44 10 Q38 12 36 18 Q46 16 50 26 Q40 24 34 30 Q46 30 50 40 Q38 36 30 40 Q24 42 22 50 Z"/>' +
+      '<path class="ci-fill" d="M40 6 L44 -2 L46 8 Z"/><path class="ci-fill" d="M48 12 L56 8 L52 18 Z"/>' +
+      '<path class="ci-eye-glow" d="M42 22 L52 22 L47 30 Z"/>' +
+      '<circle class="ci-eye" cx="41" cy="14" r="2"/>'
+  };
+  function creatureIconMarkup(name){
+    var inner = CREATURE_ICON_PATHS[name] || CREATURE_ICON_PATHS['Goblin'];
+    return '<svg class="creature-icon" viewBox="0 0 64 64">' + inner + '</svg>';
+  }
+
+  // Small inline stat icons for the encounter card's stat pills.
+  var CARD_ICON_HEART = '<svg viewBox="0 0 24 24"><path d="M12 21s-6.7-4.35-9.5-8.3C.6 9.9 1.4 6.3 4.4 5 6.6 4 9 4.8 12 8c3-3.2 5.4-4 7.6-3 3 1.3 3.8 4.9 1.9 7.7C18.7 16.65 12 21 12 21z"/></svg>';
+  var CARD_ICON_SWORD = '<svg viewBox="0 0 24 24"><path d="M20.5 2.5l1 1-6.6 6.6 1.4 1.4-1.4 1.4-1.4-1.4-8.4 8.4-2.3.7.7-2.3 8.4-8.4-1.4-1.4 1.4-1.4 1.4 1.4L20.5 2.5z"/></svg>';
+  var CARD_ICON_COIN = '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/></svg>';
+
   function renderRunScreen(){
     document.getElementById('trial-badge').textContent = 'Trial ' + (state.trial + 1) + ' / ' + TRIAL_COUNT;
 
@@ -1310,19 +1687,40 @@
 
     var node = state.encounters[state.encounterStep];
     var tier = TIERS[node.tier];
+    var subtitleKind = node.kind === 'boss' ? (node.bossLabel || 'Boss') : ENCOUNTER_DISPLAY[node.kind];
+    var flavor = node.hint ? node.hint : (node.kind === 'boss' ? 'A named terror — no hints down here.' : 'No obvious tells. Read the letters as they fall.');
     var card = document.getElementById('encounter-card');
     card.style.setProperty('--tier-color', tier.color);
     card.innerHTML =
-      '<div class="encounter-eyebrow">' + (node.kind === 'boss' ? (node.bossLabel || 'Boss') : ENCOUNTER_DISPLAY[node.kind]) + '</div>' +
-      '<div class="encounter-stats">' +
-        '<span class="encounter-stat" style="color:' + tier.color + '">' + tier.name + '</span>' +
-        '<span class="encounter-stat">L' + node.length + '</span>' +
-        '<span class="encounter-stat">' + node.hp + ' HP</span>' +
-        '<span class="encounter-stat">atk ' + node.atk + '/rd</span>' +
-        '<span class="encounter-stat gold">+' + node.spoils + ' spoils</span>' +
+      '<div class="card-level-badge">' + node.tier + '</div>' +
+      '<div class="card-portrait">' + creatureIconMarkup(node.creature) + '</div>' +
+      '<div class="card-name-banner">' +
+        '<span class="card-name">' + node.creature + '</span>' +
+        '<span class="card-subtitle">' + subtitleKind + ' · ' + tier.name + ' · ' + node.length + '-Letter</span>' +
       '</div>' +
-      '<button class="encounter-fight-btn" id="encounter-fight-btn" type="button">Fight</button>';
+      '<div class="card-stat-row">' +
+        '<span class="card-stat hp">' + CARD_ICON_HEART + node.hp + '</span>' +
+        '<span class="card-stat atk">' + CARD_ICON_SWORD + node.atk + '/rd</span>' +
+        '<span class="card-stat gold">' + CARD_ICON_COIN + '+' + node.spoils + '</span>' +
+      '</div>' +
+      '<div class="card-flavor' + (node.hint ? ' has-hint' : '') + '">' + flavor + '</div>' +
+      '<button class="encounter-fight-btn" id="encounter-fight-btn" type="button">Fight</button>' +
+      (state.rogueFreeFlee && node.kind !== 'boss'
+        ? '<button class="encounter-flee-btn" id="encounter-flee-btn" type="button"' + (state.rogueFreeFleeUsedThisTrial ? ' disabled' : '') + '>' +
+            (state.rogueFreeFleeUsedThisTrial ? 'Vanish used this Trial' : 'Vanish (free, once/Trial)') +
+          '</button>'
+        : '');
     document.getElementById('encounter-fight-btn').addEventListener('click', function(){ startEncounterFight(node); });
+    var fleeBtn = document.getElementById('encounter-flee-btn');
+    if (fleeBtn) fleeBtn.addEventListener('click', useFreeFlee);
+  }
+
+  function useFreeFlee(){
+    var node = state.encounters[state.encounterStep];
+    if (!state.rogueFreeFlee || state.rogueFreeFleeUsedThisTrial || node.kind === 'boss') return;
+    state.rogueFreeFleeUsedThisTrial = true;
+    log('Vanish — slipped away from the ' + (node.kind === 'big' ? 'Champion' : 'Warden') + ' without a trace. No fight, no spoils.', 'event-shop');
+    advanceEncounter('skipped');
   }
 
   function startEncounterFight(node){
@@ -1376,7 +1774,7 @@
     state.spoils -= offer.cost;
     offer.purchased = true;
     if (offer.kind === 'armor'){
-      state.shield += offer.value;
+      addShield(offer.value);
       log('Bought ' + offer.name + ' — shield is now ' + state.shield + '.', 'event-shop');
     } else {
       state.inventory.push({ id: state.nextItemId++, kind: offer.kind, value: offer.value });
@@ -1540,6 +1938,11 @@
         if (fight.bestState[i] === 'unknown'){ dmg += 1; fight.bestState[i] = 'yellow'; }
       }
     }
+    // Rogue's Sneak Attack: the free wind-up round (guess 1, already
+    // retaliation-free) also hits harder.
+    if (fight.guessesUsed === 1 && state.sneakAttack && dmg > 0){
+      dmg = Math.ceil(dmg * 1.5);
+    }
     var isSolve = (guess === node.word);
     var hpBefore = fight.enemyHP;
 
@@ -1645,10 +2048,11 @@
       ? 'Ground down, then named — the word falls'
       : 'Solved outright — instant kill';
 
+    var bonusSpoils = state.rogueBonusSpoils || 0;
     var statRows = [
       ['Guesses used', fight.guessesUsed + ' / ' + effectiveMaxGuesses()],
       ['Damage dealt', (fight.totalDamage || 0) + ' dmg'],
-      ['Spoils earned', '+' + node.spoils],
+      ['Spoils earned', '+' + (node.spoils + bonusSpoils) + (bonusSpoils > 0 ? ' (incl. Light Fingers)' : '')],
       ['XP earned', '+' + (node.spoils + totalOverkillXp) + (totalOverkillXp > 0 ? ' (incl. overkill)' : '')]
     ];
     var statsEl = document.getElementById('fr-stats');
@@ -1677,7 +2081,7 @@
   function advanceEncounter(result){
     var node = state.encounters[state.encounterStep];
     if (result === 'won'){
-      state.spoils += node.spoils;
+      state.spoils += node.spoils + (state.rogueBonusSpoils || 0); // Rogue's Light Fingers (Lv3)
       state.fightsCleared++;
       earnXp(node.spoils); // same length+tier formula as Spoils, banked across runs
       state.defeatedWords.push({ word: node.word, length: node.length, tier: node.tier, type: node.type });
@@ -1803,8 +2207,8 @@
 
   document.getElementById('shop-continue').addEventListener('click', leaveShop);
   document.getElementById('restart-btn').addEventListener('click', startRun);
-  document.getElementById('power-buy').addEventListener('click', buyPower);
-  document.getElementById('power-skip').addEventListener('click', skipPower);
+  // Class-card buttons (Level Up / Play as X) are wired per-card inside
+  // renderClassOffers() instead of by a fixed id, since there are 3 of them.
 
   // ---------- debug / God-mode panel (testing only) ----------
   // Always present at the base URL (no ?debug=1 needed), gated behind a PIN
@@ -1821,20 +2225,14 @@
     var lockView = document.getElementById('debug-lock');
     var toolsView = document.getElementById('debug-tools');
     var select = document.getElementById('debug-item-select');
-    var powerSelect = document.getElementById('debug-power-select');
+    var classSelect = document.getElementById('debug-class-select');
+    var classLevelSelect = document.getElementById('debug-class-level-select');
 
     SHOP_CATALOG.forEach(function(tpl, i){
       var opt = document.createElement('option');
       opt.value = String(i);
       opt.textContent = tpl.name;
       select.appendChild(opt);
-    });
-
-    POWERS.forEach(function(power, i){
-      var opt = document.createElement('option');
-      opt.value = String(i);
-      opt.textContent = power.name;
-      powerSelect.appendChild(opt);
     });
 
     function isUnlocked(){
@@ -1884,7 +2282,7 @@
       var tpl = SHOP_CATALOG[Number(select.value)];
       if (!tpl) return;
       if (tpl.kind === 'armor'){
-        state.shield += tpl.value;
+        addShield(tpl.value);
         log('[Debug] Granted ' + tpl.name + ' — shield is now ' + state.shield + '.', 'event-shop');
       } else {
         state.inventory.push({ id: state.nextItemId++, kind: tpl.kind, value: tpl.value });
@@ -1901,26 +2299,34 @@
       renderTopbar();
     });
 
-    var powerBtn = document.getElementById('debug-give-power');
-    powerBtn.disabled = false;
-    powerBtn.title = 'Instantly applies the chosen Power to the current run, free of charge (bypasses the XP cost).';
-    powerBtn.addEventListener('click', function(){
-      if (!state || state.ended) return;
-      var power = POWERS[Number(powerSelect.value)];
-      if (!power) return;
-      power.apply(state);
-      log('[Debug] Instantly granted Power: ' + power.name + ' — ' + power.desc, 'event-shop');
-      renderTopbar();
+    document.getElementById('debug-grant-xp').addEventListener('click', function(){
+      earnXp(50);
+      log('[Debug] Granted 50 XP.', 'event-shop');
+    });
+
+    document.getElementById('debug-set-class-level').addEventListener('click', function(){
+      // Class levels are persistent meta-progression (like XP), not
+      // per-run state, so this writes straight to classLevels/localStorage
+      // rather than touching the current run — it takes effect the next
+      // time that class is chosen on the Class-select screen.
+      var classId = classSelect.value;
+      var level = Number(classLevelSelect.value);
+      classLevels[classId] = level;
+      saveClassLevels();
+      log('[Debug] Forced ' + classId + ' to level ' + level + '.', 'event-shop');
+      if (!document.getElementById('class-view').classList.contains('hidden')) renderClassOffers();
     });
 
     document.getElementById('debug-reset-run').addEventListener('click', function(){
       // startRun() -> freshRunState() already zeroes spoils and shield for
-      // the new run; XP is deliberately persistent meta-progression
-      // (survives across runs via localStorage), so it's the one thing this
-      // debug reset has to clear out itself to actually get back to a truly
-      // blank baseline.
+      // the new run; XP and class levels are deliberately persistent
+      // meta-progression (survive across runs via localStorage), so they're
+      // the things this debug reset has to clear out itself to actually get
+      // back to a truly blank baseline.
       xpBank = 0;
       saveXpBank(xpBank);
+      classLevels = { warrior: 0, mage: 0, rogue: 0 };
+      saveClassLevels();
       startRun();
     });
   })();
